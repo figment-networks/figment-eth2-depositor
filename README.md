@@ -23,51 +23,23 @@ Installation
 
 1. Clone the repository
 2. Install the npm dependencies `npm install`
-4. Set a working version of the compiler `npx truffle obtain --solc 0.8.1`
-
-Test on your local blockchain
-------------
-
-1. Clone the repository
-2. Install the npm dependencies.
-3. Install [Ganache](https://www.trufflesuite.com/ganache) and [Truffle](https://www.trufflesuite.com/truffle)
-4. Set an working version of the compiler `npx truffle obtain --solc 0.8.1`
-5. Run ganache and quick start an empty workspace
-6. Tun `npx truffle deploy` to compile & deploy.
+3. Set a working version of the compiler `npx truffle obtain --solc v0.8.1+commit.df193b15`
 
 Deployment (Goerli)
 ------------
 
-Smart contracts should be deployed with such constructor parameters:
+1. Create a `secrets.json` file with:
+  * Your **mnemonic** 
+  * Infura **projectId**  
+  * Ether-scan **etherScanApiKey**
+2. Deploy the contract `npx truffle migrate --network goerli`
+3. Run `npx truffle run verify FigmentEth2Depositor --network goerli`
 
-1. create a `secrets.json` file with **mnemonic** and infura **projectId**
-2. deploy the contract `npx truffle migrate --network goerli`
-
+```text
+Verifying FigmentEth2Depositor
+Pass - Verified: https://goerli.etherscan.io/address/0x7F928Cd880Dff0cFbe2055B611908CEc7dBF95E8#contracts
+Successfully verified 1 contract(s).
 ```
-....
-
-2_contract_migration.js
-=======================
-
-   Deploying 'FigmentEth2Depositor'
-   --------------------------------
-   > transaction hash:    0x2213b23bd3853dd7a1c6a8b3407baf1eeed84e28cba10cfbbf986f689c1ef5aa
-   > Blocks: 2            Seconds: 24
-   > contract address:    0x35D6EC221C799f29ACC2B7246ef1CCb0d4334ab5
-
-...
-```
-
-3. At the end of deployment save the **contract address**
-4. Consult the contract on explorer: `https://goerli.etherscan.io/address/<CONTRACT_ADDRESS>`
-
-
-
-```
-https://goerli.etherscan.io/address/0x35D6EC221C799f29ACC2B7246ef1CCb0d4334ab5
-```
-
-> Deployment fees: **0.001361887011080639**
 
 How to Use
 ------------
