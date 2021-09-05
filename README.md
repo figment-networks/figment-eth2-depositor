@@ -21,7 +21,7 @@ Below is a list of contracts we use for this service:
 Installation
 ------------
 
-1. Clone the repository
+1. Clone the repository `git clone git@github.com:figment-networks/figment-eth2-depositor.git`
 2. Install the npm dependencies `npm install`
 3. Set a working version of the compiler `npx truffle obtain --solc v0.8.1+commit.df193b15`
 
