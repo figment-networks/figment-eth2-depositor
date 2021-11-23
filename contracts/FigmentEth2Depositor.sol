@@ -75,7 +75,7 @@ contract FigmentEth2Depositor is ReentrancyGuard, Pausable, Ownable {
             deposit_data_roots.length == nodesAmount,
             "FigmentEth2Depositor: amount of parameters do no match");
 
-        for (uint256 i = 0; i < nodesAmount; ++i) {
+        for (uint256 i; i < nodesAmount; ++i) {
             require(pubkeys[i].length == pubkeyLength, "FigmentEth2Depositor: wrong pubkey");
             require(withdrawal_credentials[i].length == credentialsLength, "FigmentEth2Depositor: wrong withdrawal credentials");
             require(signatures[i].length == signatureLength, "FigmentEth2Depositor: wrong signatures");
