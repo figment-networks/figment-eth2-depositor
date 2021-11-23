@@ -12,7 +12,7 @@ contract FigmentEth2Depositor is ReentrancyGuard, Pausable, Ownable {
     /**
      * @dev Eth2 Deposit Contract address.
      */
-    IDepositContract public depositContract;
+    IDepositContract public immutable depositContract;
 
     /**
      * @dev Minimal and maximum amount of nodes per transaction.
