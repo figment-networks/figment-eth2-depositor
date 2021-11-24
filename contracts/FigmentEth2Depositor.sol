@@ -11,7 +11,7 @@ contract FigmentEth2Depositor is Pausable, Ownable {
     /**
      * @dev Eth2 Deposit Contract address.
      */
-    IDepositContract public depositContract;
+    IDepositContract public immutable depositContract;
 
     /**
      * @dev Minimal and maximum amount of nodes per transaction.
@@ -30,14 +30,9 @@ contract FigmentEth2Depositor is Pausable, Ownable {
     /**
      * @dev Setting Eth2 Smart Contract address during construction.
      */
-    constructor(bool mainnet, address depositContract_) {
-        if (mainnet == true) {
-            depositContract = IDepositContract(0x00000000219ab540356cBB839Cbe05303d7705Fa);
-        } else if (depositContract_ == 0x0000000000000000000000000000000000000000) {
-            depositContract = IDepositContract(0x8c5fecdC472E27Bc447696F431E425D02dd46a8c);
-        } else {
-            depositContract = IDepositContract(depositContract_);
-        }
+    constructor(address depositContract_) {
+        require(depositContract_ != address(0), "Zero address");
+        depositContract = IDepositContract(depositContract_);
     }
 
     /**
