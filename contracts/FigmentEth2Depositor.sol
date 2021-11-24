@@ -4,10 +4,9 @@ pragma solidity 0.8.10;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "../contracts/interfaces/IDepositContract.sol";
 
-contract FigmentEth2Depositor is ReentrancyGuard, Pausable, Ownable {
+contract FigmentEth2Depositor is Pausable, Ownable {
 
     /**
      * @dev Eth2 Deposit Contract address.
