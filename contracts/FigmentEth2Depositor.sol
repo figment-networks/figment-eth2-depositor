@@ -39,7 +39,7 @@ contract FigmentEth2Depositor is Pausable, Ownable {
      * @dev This contract will not accept direct ETH transactions.
      */
     receive() external payable {
-        revert("FigmentEth2Depositor: do not send ETH directly here");
+        revert("Do not send ETH here");
     }
 
     /**
@@ -59,20 +59,20 @@ contract FigmentEth2Depositor is Pausable, Ownable {
 
         uint256 nodesAmount = pubkeys.length;
 
-        require(nodesAmount > 0 && nodesAmount <= 100, "FigmentEth2Depositor: you can deposit only 1 to 100 nodes per transaction");
-        require(msg.value == collateral * nodesAmount, "FigmentEth2Depositor: the amount of ETH does not match the amount of nodes");
+        require(nodesAmount > 0 && nodesAmount <= 100, "100 nodes max / tx");
+        require(msg.value == collateral * nodesAmount, "ETH amount missmatch");
 
 
         require(
             withdrawal_credentials.length == nodesAmount &&
             signatures.length == nodesAmount &&
             deposit_data_roots.length == nodesAmount,
-            "FigmentEth2Depositor: amount of parameters do no match");
+            "Paramters missmatch");
 
         for (uint256 i; i < nodesAmount; ++i) {
-            require(pubkeys[i].length == pubkeyLength, "FigmentEth2Depositor: wrong pubkey");
-            require(withdrawal_credentials[i].length == credentialsLength, "FigmentEth2Depositor: wrong withdrawal credentials");
-            require(signatures[i].length == signatureLength, "FigmentEth2Depositor: wrong signatures");
+            require(pubkeys[i].length == pubkeyLength, "Wrong pubkey");
+            require(withdrawal_credentials[i].length == credentialsLength, "Wrong withdrawal cred");
+            require(signatures[i].length == signatureLength, "Wrong signatures");
 
             IDepositContract(address(depositContract)).deposit{value: collateral}(
                 pubkeys[i],
