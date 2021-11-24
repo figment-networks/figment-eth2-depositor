@@ -68,9 +68,7 @@
            "runs": 200
          },
          "evmVersion": "istanbul",
-         "libraries": {
-           "": {}
-         },
+         "libraries": {},
          "outputSelection": {
            "*": {
              "*": [
