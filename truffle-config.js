@@ -60,7 +60,7 @@
    // Configure your compilers
    compilers: {
      solc: {
-       version: "v0.8.1+commit.df193b15", // Fetch exact version from solc-bin (default: truffle's version)
+       version: "v0.8.10+commit.fc410830", // Fetch exact version from solc-bin (default: truffle's version)
        settings: {
          "remappings": [],
          "optimizer": {
@@ -68,9 +68,7 @@
            "runs": 200
          },
          "evmVersion": "istanbul",
-         "libraries": {
-           "": {}
-         },
+         "libraries": {},
          "outputSelection": {
            "*": {
              "*": [

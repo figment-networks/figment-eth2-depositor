@@ -1,18 +1,17 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.0;
+pragma solidity 0.8.10;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "../contracts/interfaces/IDepositContract.sol";
 
-contract FigmentEth2Depositor is ReentrancyGuard, Pausable, Ownable {
+contract FigmentEth2Depositor is Pausable, Ownable {
 
     /**
      * @dev Eth2 Deposit Contract address.
      */
-    IDepositContract public depositContract;
+    IDepositContract public immutable depositContract;
 
     /**
      * @dev Minimal and maximum amount of nodes per transaction.
@@ -31,21 +30,16 @@ contract FigmentEth2Depositor is ReentrancyGuard, Pausable, Ownable {
     /**
      * @dev Setting Eth2 Smart Contract address during construction.
      */
-    constructor(bool mainnet, address depositContract_) {
-        if (mainnet == true) {
-            depositContract = IDepositContract(0x00000000219ab540356cBB839Cbe05303d7705Fa);
-        } else if (depositContract_ == 0x0000000000000000000000000000000000000000) {
-            depositContract = IDepositContract(0x8c5fecdC472E27Bc447696F431E425D02dd46a8c);
-        } else {
-            depositContract = IDepositContract(depositContract_);
-        }
+    constructor(address depositContract_) {
+        require(depositContract_ != address(0), "Zero address");
+        depositContract = IDepositContract(depositContract_);
     }
 
     /**
      * @dev This contract will not accept direct ETH transactions.
      */
     receive() external payable {
-        revert("FigmentEth2Depositor: do not send ETH directly here");
+        revert("Do not send ETH here");
     }
 
     /**
@@ -65,20 +59,20 @@ contract FigmentEth2Depositor is ReentrancyGuard, Pausable, Ownable {
 
         uint256 nodesAmount = pubkeys.length;
 
-        require(nodesAmount > 0 && nodesAmount <= 100, "FigmentEth2Depositor: you can deposit only 1 to 100 nodes per transaction");
-        require(msg.value == collateral * nodesAmount, "FigmentEth2Depositor: the amount of ETH does not match the amount of nodes");
+        require(nodesAmount > 0 && nodesAmount <= 100, "100 nodes max / tx");
+        require(msg.value == collateral * nodesAmount, "ETH amount missmatch");
 
 
         require(
             withdrawal_credentials.length == nodesAmount &&
             signatures.length == nodesAmount &&
             deposit_data_roots.length == nodesAmount,
-            "FigmentEth2Depositor: amount of parameters do no match");
+            "Paramters missmatch");
 
-        for (uint256 i = 0; i < nodesAmount; ++i) {
-            require(pubkeys[i].length == pubkeyLength, "FigmentEth2Depositor: wrong pubkey");
-            require(withdrawal_credentials[i].length == credentialsLength, "FigmentEth2Depositor: wrong withdrawal credentials");
-            require(signatures[i].length == signatureLength, "FigmentEth2Depositor: wrong signatures");
+        for (uint256 i; i < nodesAmount; ++i) {
+            require(pubkeys[i].length == pubkeyLength, "Wrong pubkey");
+            require(withdrawal_credentials[i].length == credentialsLength, "Wrong withdrawal cred");
+            require(signatures[i].length == signatureLength, "Wrong signatures");
 
             IDepositContract(address(depositContract)).deposit{value: collateral}(
                 pubkeys[i],
@@ -99,7 +93,7 @@ contract FigmentEth2Depositor is ReentrancyGuard, Pausable, Ownable {
      *
      * - The contract must not be paused.
      */
-    function pause() public onlyOwner {
+    function pause() external onlyOwner {
       _pause();
     }
 
@@ -110,7 +104,7 @@ contract FigmentEth2Depositor is ReentrancyGuard, Pausable, Ownable {
      *
      * - The contract must be paused.
      */
-    function unpause() public onlyOwner {
+    function unpause() external onlyOwner {
       _unpause();
     }
 
