@@ -60,14 +60,14 @@ contract FigmentEth2Depositor is Pausable, Ownable {
         uint256 nodesAmount = pubkeys.length;
 
         require(nodesAmount > 0 && nodesAmount <= 100, "100 nodes max / tx");
-        require(msg.value == collateral * nodesAmount, "ETH amount missmatch");
+        require(msg.value == collateral * nodesAmount, "ETH amount mismatch");
 
 
         require(
             withdrawal_credentials.length == nodesAmount &&
             signatures.length == nodesAmount &&
             deposit_data_roots.length == nodesAmount,
-            "Paramters missmatch");
+            "Parameters missmatch");
 
         for (uint256 i; i < nodesAmount; ++i) {
             require(pubkeys[i].length == pubkeyLength, "Wrong pubkey");
