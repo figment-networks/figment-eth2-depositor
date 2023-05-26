@@ -17,7 +17,7 @@ contract FigmentEth2Depositor is Pausable, Ownable {
      * @dev Minimal and maximum amount of nodes per transaction.
      */
     uint256 public constant nodesMinAmount = 1;
-    uint256 public constant nodesMaxAmount = 100;
+    uint256 public constant nodesMaxAmount = 300;
     uint256 public constant pubkeyLength = 48;
     uint256 public constant credentialsLength = 32;
     uint256 public constant signatureLength = 96;
@@ -43,7 +43,7 @@ contract FigmentEth2Depositor is Pausable, Ownable {
     }
 
     /**
-     * @dev Function that allows to deposit up to 100 nodes at once.
+     * @dev Function that allows to deposit up to 300 nodes at once.
      *
      * - pubkeys                - Array of BLS12-381 public keys.
      * - withdrawal_credentials - Array of commitments to a public keys for withdrawals.
@@ -59,7 +59,7 @@ contract FigmentEth2Depositor is Pausable, Ownable {
 
         uint256 nodesAmount = pubkeys.length;
 
-        require(nodesAmount > 0 && nodesAmount <= 100, "100 nodes max / tx");
+        require(nodesAmount > 0 && nodesAmount <= 300, "300 nodes max / tx");
         require(msg.value == collateral * nodesAmount, "ETH amount mismatch");
 
 
