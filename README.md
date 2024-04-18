@@ -18,7 +18,7 @@ Below is a list of contracts we use for this service:
   <dd>A smart contract that accepts X amount of ETH and sends {x / 32} transactions with required collateral (32 ETH) to the Eth2 Deposit Contract.</dd>
 </dl>
 
-Installation
+Installation (**DEPRECATED**, see [PR#26](https://github.com/figment-networks/figment-eth2-depositor/pull/26))
 ------------
 
 1. Clone the repository `git clone git@github.com:figment-networks/figment-eth2-depositor.git`
