@@ -6,6 +6,9 @@ The Figment Eth2 Depositor provides a convenient way to send 1 or more deposits 
 Contracts
 =========
 
+- Contract address on mainnet: 0x00000000219ab540356cBB839Cbe05303d7705Fa
+- Contract address on (Goerli) testnet: 0x8c5fecdC472E27Bc447696F431E425D02dd46a8c 
+
 Below is a list of contracts we use for this service:
 
 <dl>
