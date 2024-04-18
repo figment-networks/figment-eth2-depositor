@@ -22,9 +22,10 @@ Installation
 ------------
 
 1. Clone the repository `git clone git@github.com:figment-networks/figment-eth2-depositor.git`
-2. **AS OF REMOVAL OF THE `package.json` file from this repo in April 2024**: Install ETH development environment of your choice locally (Forge, Truffle, etc.)
+2. Install the npm dependencies `npm install`
+3. Set a working version of the compiler `npx truffle obtain --solc v0.8.10+commit.fc410830`
 
-Deployment (Goerli) **GOERLI DEPRECATED**
+Deployment (Goerli)
 ------------
 
 1. Create a `secrets.json` file with:
