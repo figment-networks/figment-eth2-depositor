@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: CC0-1.0
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.10;
 
 // This interface is designed to be compatible with the Vyper version.
 /// @notice This is the Ethereum 2.0 deposit contract interface.
-/// For more information see the Phase 0 specification under https://github.com/ethereum/eth2.0-specs
+/// For more information see https://github.com/ethereum/consensus-specs/tree/master/solidity_deposit_contract
 interface IDepositContract {
     /// @notice A processed deposit event.
     event DepositEvent(
@@ -16,9 +16,9 @@ interface IDepositContract {
     );
 
     /// @notice Submit a Phase 0 DepositData object.
-    /// @param pubkey A BLS12-381 public key.
-    /// @param withdrawal_credentials Commitment to a public key for withdrawals.
-    /// @param signature A BLS12-381 signature.
+    /// @param pubkey A BLS12-381 public key (48 bytes).
+    /// @param withdrawal_credentials Commitment to a public key for withdrawals (32 bytes).
+    /// @param signature A BLS12-381 signature (96 bytes).
     /// @param deposit_data_root The SHA-256 hash of the SSZ-encoded DepositData object.
     /// Used as a protection against malformed input.
     function deposit(
