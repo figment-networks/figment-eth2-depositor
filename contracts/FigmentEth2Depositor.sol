@@ -26,7 +26,6 @@ contract FigmentEth2Depositor is Pausable, Ownable {
     /**
      * @dev Minimal and maximum amount of nodes per transaction.
      */
-    uint256 public constant NODES_MIN_AMOUNT = 1;
     uint256 public constant NODES_MAX_AMOUNT = 250; // Reasonable limit to prevent gas issues
     uint256 public constant PUBKEY_LENGTH = 48;
     uint256 public constant CREDENTIALS_LENGTH = 32;
@@ -35,7 +34,7 @@ contract FigmentEth2Depositor is Pausable, Ownable {
     /**
      * @dev Gwei to wei conversion factor.
      */
-    uint256 public constant GWEI_TO_WEI = 1e9;
+    uint256 public constant GWEI_TO_WEI = 1_000_000_000; // 1e9
 
     /**
      * @dev Minimum collateral size of one node.
@@ -43,7 +42,7 @@ contract FigmentEth2Depositor is Pausable, Ownable {
     uint256 public constant MIN_COLLATERAL = 32 ether;
 
     /**
-     * @dev Minimum collateral in gwei (precomputed to save gas).
+     * @dev Minimum collateral in gwei
      */
     uint256 public constant MIN_COLLATERAL_GWEI = 32_000_000_000; // 32 * 1e9
 
