@@ -9,6 +9,16 @@ import "../contracts/interfaces/IDepositContract.sol";
 contract FigmentEth2Depositor is Pausable, Ownable {
 
     /**
+     * @dev Custom errors for better gas efficiency and debugging
+     */
+    error InsufficientAmount(uint256 provided, uint256 minimum);
+    error EthAmountMismatch(uint256 provided, uint256 expected);
+    error ParametersMismatch(uint256 expected, uint256 provided);
+    error InvalidValidatorData(uint256 index, string field);
+    error ZeroAddress();
+    error DirectEthTransferNotAllowed();
+
+    /**
      * @dev Eth2 Deposit Contract address.
      */
     IDepositContract public immutable depositContract;
@@ -30,7 +40,9 @@ contract FigmentEth2Depositor is Pausable, Ownable {
      * @dev Setting Eth2 Smart Contract address during construction.
      */
     constructor(address depositContract_) Ownable(msg.sender) {
-        require(depositContract_ != address(0), "Zero address");
+        if (depositContract_ == address(0)) {
+            revert ZeroAddress();
+        }
         depositContract = IDepositContract(depositContract_);
     }
 
@@ -38,7 +50,7 @@ contract FigmentEth2Depositor is Pausable, Ownable {
      * @dev This contract will not accept direct ETH transactions.
      */
     receive() external payable {
-        revert("Do not send ETH here");
+        revert DirectEthTransferNotAllowed();
     }
 
     /**
@@ -60,28 +72,46 @@ contract FigmentEth2Depositor is Pausable, Ownable {
 
         uint256 nodesAmount = pubkeys.length;
 
-        require(nodesAmount > 0, "1 node min / tx");
+        if (nodesAmount == 0) {
+            revert ParametersMismatch(1, 0);
+        }
 
-        require(
-            withdrawal_credentials.length == nodesAmount &&
-            signatures.length == nodesAmount &&
-            deposit_data_roots.length == nodesAmount &&
-            amounts.length == nodesAmount,
-            "Parameters mismatch");
+        if (withdrawal_credentials.length != nodesAmount) {
+            revert ParametersMismatch(nodesAmount, withdrawal_credentials.length);
+        }
+        if (signatures.length != nodesAmount) {
+            revert ParametersMismatch(nodesAmount, signatures.length);
+        }
+        if (deposit_data_roots.length != nodesAmount) {
+            revert ParametersMismatch(nodesAmount, deposit_data_roots.length);
+        }
+        if (amounts.length != nodesAmount) {
+            revert ParametersMismatch(nodesAmount, amounts.length);
+        }
 
         // Calculate total expected ETH amount
         uint256 totalAmount = 0;
         for (uint256 i; i < nodesAmount; ++i) {
-            require(amounts[i] > 0, "Amount must be greater than 0");
+            if (amounts[i] < collateral) {
+                revert InsufficientAmount(amounts[i], collateral);
+            }
             totalAmount += amounts[i];
         }
 
-        require(msg.value == totalAmount, "ETH amount mismatch");
+        if (msg.value != totalAmount) {
+            revert EthAmountMismatch(msg.value, totalAmount);
+        }
 
         for (uint256 i; i < nodesAmount; ++i) {
-            require(pubkeys[i].length == pubkeyLength, "Wrong pubkey");
-            require(withdrawal_credentials[i].length == credentialsLength, "Wrong withdrawal cred");
-            require(signatures[i].length == signatureLength, "Wrong signatures");
+            if (pubkeys[i].length != pubkeyLength) {
+                revert InvalidValidatorData(i, "pubkey");
+            }
+            if (withdrawal_credentials[i].length != credentialsLength) {
+                revert InvalidValidatorData(i, "withdrawal_credentials");
+            }
+            if (signatures[i].length != signatureLength) {
+                revert InvalidValidatorData(i, "signature");
+            }
 
             IDepositContract(address(depositContract)).deposit{value: amounts[i]}(
                 pubkeys[i],
