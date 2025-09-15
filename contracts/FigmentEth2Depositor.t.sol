@@ -2,7 +2,7 @@
 pragma solidity ^0.8.28;
 
 import {FigmentEth2Depositor} from "./FigmentEth2Depositor.sol";
-import {Test} from "forge-std/Test.sol";
+import {Test} from "forge-std/src/Test.sol";
 
 contract FigmentEth2DepositorTest is Test {
   FigmentEth2Depositor depositor;

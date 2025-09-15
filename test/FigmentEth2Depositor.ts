@@ -21,6 +21,7 @@ describe("FigmentEth2Depositor", async function () {
       address: depositor.address,
       abi: depositor.abi,
       functionName: "depositContract",
+      args: [],
     });
 
     assert.equal(contractDepositContract.toLowerCase(), mockDepositContract.toLowerCase());
@@ -34,6 +35,7 @@ describe("FigmentEth2Depositor", async function () {
       address: depositor.address,
       abi: depositor.abi,
       functionName: "paused",
+      args: [],
     });
 
     assert.equal(paused, false);
