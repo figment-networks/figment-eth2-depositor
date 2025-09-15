@@ -1,13 +1,68 @@
-Figment Finance Eth2 Depositor
-=========
+# Figment Ethereum Deposit Contracts
+
+## Installation
+
+1. Clone the repository `git clone git@github.com:figment-networks/figment-eth2-depositor.git`
+2. Install the npm dependencies `pnpm install`
+
+
+## Usage
+
+### Running Tests
+
+To run all the tests in the project, execute the following command:
+
+```shell
+pnpm hardhat test
+```
+
+You can also selectively run the Solidity or `node:test` tests:
+
+```shell
+pnpm hardhat test solidity
+pnpm hardhat test nodejs
+```
+
+### Make a deployment to Sepolia
+
+This project includes an example Ignition module to deploy the contract. You can deploy this module to a locally simulated chain or to Sepolia.
+
+To run the deployment to a local chain:
+
+```shell
+pnpm hardhat ignition deploy ignition/modules/FigmentEth2Depositor.ts
+```
+
+To run the deployment to Sepolia, you need an account with funds to send the transaction. The provided Hardhat configuration includes a Configuration Variable called `SEPOLIA_PRIVATE_KEY`, which you can use to set the private key of the account you want to use.
+
+You can set the `SEPOLIA_PRIVATE_KEY` variable using the `hardhat-keystore` plugin or by setting it as an environment variable.
+
+To set the `SEPOLIA_PRIVATE_KEY` config variable using `hardhat-keystore`:
+
+```shell
+pnpm hardhat keystore set SEPOLIA_PRIVATE_KEY
+```
+
+After setting the variable, you can run the deployment with the Sepolia network:
+
+```shell
+pnpm hardhat ignition deploy --network sepolia ignition/modules/Counter.ts
+```
+
+
+## License
+
+MIT
+
+
+## FigmentEth2Depositor Contract
 
 The Figment Eth2 Depositor provides a convenient way to send 1 or more deposits in one transaction to the Eth2 Deposit Contract.
 
-Contracts
-=========
+### Contract Addresses
 
-- Contract address on mainnet: 0x00000000219ab540356cBB839Cbe05303d7705Fa
-- Contract address on (Goerli) testnet: 0x8c5fecdC472E27Bc447696F431E425D02dd46a8c 
+- Contract address on mainnet: `0x00000000219ab540356cBB839Cbe05303d7705Fa`
+- Contract address on (Hoodi) testnet: `0x00000000219ab540356cBB839Cbe05303d7705Fa`
 
 Below is a list of contracts we use for this service:
 
@@ -21,38 +76,9 @@ Below is a list of contracts we use for this service:
   <dd>A smart contract that accepts X amount of ETH and sends {x / 32} transactions with required collateral (32 ETH) to the Eth2 Deposit Contract.</dd>
 </dl>
 
-Installation (**DEPRECATED**, see [PR#26](https://github.com/figment-networks/figment-eth2-depositor/pull/26))
-------------
-
-1. Clone the repository `git clone git@github.com:figment-networks/figment-eth2-depositor.git`
-2. Install the npm dependencies `npm install`
-3. Set a working version of the compiler `npx truffle obtain --solc v0.8.10+commit.fc410830`
-
-Deployment (Goerli)
-------------
-
-1. Create a `secrets.json` file with:
-  * Your **mnemonic**
-  * Infura **projectId**  
-  * Ether-scan **etherScanApiKey**
-2. Deploy the contract `npx truffle migrate --network goerli`
-3. Run `npx truffle run verify FigmentEth2Depositor --network goerli`
-
-```text
-Verifying FigmentEth2Depositor
-Pass - Verified: https://goerli.etherscan.io/address/0x7F928Cd880Dff0cFbe2055B611908CEc7dBF95E8#contracts
-Successfully verified 1 contract(s).
-```
-
-How to Use
-------------
+### How to Use
 
 1. Choose the amount of Eth2 validator nodes you want to deposit to.
 2. Instantiate those validators with your chosen `withdrawal_credentials`
 3. Retrieve your validators' `pubkeys`, and generate `deposit_signatures` and `deposit_data_roots` from each that will let you deposit to them.
 4. Use the _deposit()_ function on `FigmentEth2Depositor` with the required ETH value to make the deposits to the Eth2 Deposit Contract.
-
-License
-=========
-
-MIT
