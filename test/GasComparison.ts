@@ -4,7 +4,7 @@ import { describe, it } from "node:test";
 import { network } from "hardhat";
 import { parseEther } from "viem";
 import { GasReporter } from "./utils/gasReporter.js";
-import { generateValidatorData, measureGas, generateVariableAmounts, calculateTotalValue } from "./utils/testHelpers.js";
+import { generateValidatorData, measureGas, generateVariableAmounts, generateVariableAmountsGwei, calculateTotalValue, calculateTotalValueFromGwei, gweiToEthStrings } from "./utils/testHelpers.js";
 
 describe("Gas Cost Comparison: New vs Legacy", async function () {
   const { viem } = await network.connect();
@@ -63,10 +63,12 @@ describe("Gas Cost Comparison: New vs Legacy", async function () {
         legacyValue
       );
 
-      // New contract test (mixed amounts: 32 ETH + variable amounts)
-      const amounts = generateVariableAmounts(testCase.validators);
-      const newValue = calculateTotalValue(amounts);
-      const newArgs = [pubkeys, withdrawalCredentials, signatures, depositDataRoots, amounts];
+      // New contract test (mixed amounts in gwei: 32 ETH + variable amounts)
+      const amountsGwei = generateVariableAmountsGwei(testCase.validators);
+      const newValue = calculateTotalValueFromGwei(amountsGwei);
+      const newArgs = [pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei];
+
+      console.log(`    Gwei amounts: [${gweiToEthStrings(amountsGwei).join(', ')}] ETH`);
 
       const newGas = await measureGas(
         publicClient,

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
 import { network } from "hardhat";
-import { parseEther } from "viem";
+import { parseEther, parseGwei } from "viem";
 
 describe("FigmentEth2Depositor", async function () {
   const { viem } = await network.connect();
@@ -63,10 +63,13 @@ describe("FigmentEth2Depositor", async function () {
       ("0x" + "66".repeat(32)) as `0x${string}`, // 32 bytes deposit data root
       ("0x" + "77".repeat(32)) as `0x${string}`, // 32 bytes deposit data root
     ] as const;
-    const amounts = [
-      parseEther("32"), // 32 ETH for first validator
-      parseEther("46"), // 46 ETH for second validator (0x02 validator)
+    const amountsGwei = [
+      parseGwei("32"), // 32 ETH for first validator (in gwei)
+      parseGwei("46"), // 46 ETH for second validator (0x02 validator, in gwei)
     ];
+
+    // Calculate total ETH value in wei for transaction
+    const totalValue = amountsGwei.reduce((sum, gwei) => sum + (gwei * BigInt(1e9)), 0n);
 
     // Should fail due to missing mock deposit contract implementation
     // but we can test parameter validation
@@ -75,8 +78,8 @@ describe("FigmentEth2Depositor", async function () {
         address: depositor.address,
         abi: depositor.abi,
         functionName: "deposit",
-        args: [pubkeys, withdrawalCredentials, signatures, depositDataRoots, amounts] as any,
-        value: parseEther("78"), // Total: 32 + 46 = 78 ETH
+        args: [pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei] as any,
+        value: totalValue, // Total: 32 + 46 = 78 ETH (calculated from gwei)
       });
     } catch (error) {
       // Expected to fail due to mock contract, but should pass parameter validation

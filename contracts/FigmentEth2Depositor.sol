@@ -30,6 +30,7 @@ contract FigmentEth2Depositor is Pausable, Ownable {
     uint256 public constant pubkeyLength = 48;
     uint256 public constant credentialsLength = 32;
     uint256 public constant signatureLength = 96;
+    uint256 public constant GWEI_TO_WEI = 1e9;
 
     /**
      * @dev Minimum collateral size of one node.
@@ -60,14 +61,14 @@ contract FigmentEth2Depositor is Pausable, Ownable {
      * - withdrawal_credentials - Array of commitments to a public keys for withdrawals.
      * - signatures             - Array of BLS12-381 signatures.
      * - deposit_data_roots     - Array of the SHA-256 hashes of the SSZ-encoded DepositData objects.
-     * - amounts                - Array of deposit amounts in wei for each validator.
+     * - amounts_gwei            - Array of deposit amounts in gwei for each validator.
      */
     function deposit(
         bytes[] calldata pubkeys,
         bytes[] calldata withdrawal_credentials,
         bytes[] calldata signatures,
         bytes32[] calldata deposit_data_roots,
-        uint256[] calldata amounts
+        uint256[] calldata amounts_gwei
     ) external payable whenNotPaused {
 
         uint256 nodesAmount = pubkeys.length;
@@ -85,17 +86,18 @@ contract FigmentEth2Depositor is Pausable, Ownable {
         if (deposit_data_roots.length != nodesAmount) {
             revert ParametersMismatch(nodesAmount, deposit_data_roots.length);
         }
-        if (amounts.length != nodesAmount) {
-            revert ParametersMismatch(nodesAmount, amounts.length);
+        if (amounts_gwei.length != nodesAmount) {
+            revert ParametersMismatch(nodesAmount, amounts_gwei.length);
         }
 
-        // Calculate total expected ETH amount
+        // Convert gwei to wei and calculate total expected ETH amount
         uint256 totalAmount = 0;
+        uint256 minCollateralGwei = minCollateral / GWEI_TO_WEI; // Convert 32 ETH to gwei
         for (uint256 i; i < nodesAmount; ++i) {
-            if (amounts[i] < minCollateral) {
-                revert InsufficientAmount(amounts[i], minCollateral);
+            if (amounts_gwei[i] < minCollateralGwei) {
+                revert InsufficientAmount(amounts_gwei[i], minCollateralGwei);
             }
-            totalAmount += amounts[i];
+            totalAmount += amounts_gwei[i] * GWEI_TO_WEI; // Convert gwei to wei
         }
 
         if (msg.value != totalAmount) {
@@ -113,7 +115,8 @@ contract FigmentEth2Depositor is Pausable, Ownable {
                 revert InvalidValidatorData(i, "signature");
             }
 
-            IDepositContract(address(depositContract)).deposit{value: amounts[i]}(
+            uint256 amountWei = amounts_gwei[i] * GWEI_TO_WEI; // Convert gwei to wei
+            IDepositContract(address(depositContract)).deposit{value: amountWei}(
                 pubkeys[i],
                 withdrawal_credentials[i],
                 signatures[i],

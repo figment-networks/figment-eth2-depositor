@@ -1,7 +1,7 @@
 import { network } from "hardhat";
-import { parseEther } from "viem";
+import { parseEther, parseGwei } from "viem";
 import { GasReporter } from "../test/utils/gasReporter.js";
-import { generateValidatorData, measureGas, generateVariableAmounts, calculateTotalValue } from "../test/utils/testHelpers.js";
+import { generateValidatorData, measureGas, generateVariableAmounts, generateVariableAmountsGwei, calculateTotalValue, calculateTotalValueFromGwei, gweiToEthStrings } from "../test/utils/testHelpers.js";
 
 async function main() {
   const { viem } = await network.connect();
@@ -42,7 +42,8 @@ async function main() {
     parseEther("32")
   );
 
-  // New: Custom amount (35 ETH)
+  // New: Custom amount (35 ETH in gwei)
+  const amountGwei = parseGwei("35");
   const newGas = await measureGas(
     publicClient,
     newContract.address,
@@ -53,9 +54,9 @@ async function main() {
       singleValidatorData.withdrawalCredentials,
       singleValidatorData.signatures,
       singleValidatorData.depositDataRoots,
-      [parseEther("35")]
+      [amountGwei]
     ],
-    parseEther("35")
+    parseEther("35") // Still need to send actual ETH value in wei
   );
 
   const singleComparison = gasReporter.addComparison("Single Validator", legacyGas, newGas);
@@ -79,9 +80,11 @@ async function main() {
     parseEther("160")
   );
 
-  // New: Variable amounts using helper
-  const amounts = generateVariableAmounts(5);
-  const totalValue = calculateTotalValue(amounts);
+  // New: Variable amounts in gwei using helper
+  const amountsGwei = generateVariableAmountsGwei(5);
+  const totalValue = calculateTotalValueFromGwei(amountsGwei);
+
+  console.log(`  Using gwei amounts: [${gweiToEthStrings(amountsGwei).join(', ')}] ETH`);
 
   const newMultiGas = await measureGas(
     publicClient,
@@ -93,7 +96,7 @@ async function main() {
       multiValidatorData.withdrawalCredentials,
       multiValidatorData.signatures,
       multiValidatorData.depositDataRoots,
-      amounts
+      amountsGwei
     ],
     totalValue
   );

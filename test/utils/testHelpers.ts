@@ -1,4 +1,4 @@
-import { parseEther } from "viem";
+import { parseEther, parseGwei } from "viem";
 
 export function generateValidatorData(count: number) {
   const pubkeys = Array(count).fill(0).map((_, i) =>
@@ -45,7 +45,15 @@ export async function measureGas(
   }
 }
 
+export function generateVariableAmountsGwei(count: number): bigint[] {
+  return Array(count).fill(0).map((_, i) => {
+    if (i === 0) return parseGwei("32"); // First validator always 32 ETH in gwei
+    return parseGwei((32 + i * 2).toString()); // Increasing amounts: 32, 34, 36, 38, etc. in gwei
+  });
+}
+
 export function generateVariableAmounts(count: number): bigint[] {
+  // For legacy contracts that expect wei amounts
   return Array(count).fill(0).map((_, i) => {
     if (i === 0) return parseEther("32"); // First validator always 32 ETH
     return parseEther((32 + i * 2).toString()); // Increasing amounts: 32, 34, 36, 38, etc.
@@ -54,4 +62,14 @@ export function generateVariableAmounts(count: number): bigint[] {
 
 export function calculateTotalValue(amounts: bigint[]): bigint {
   return amounts.reduce((sum, amount) => sum + amount, 0n);
+}
+
+export function calculateTotalValueFromGwei(amountsGwei: bigint[]): bigint {
+  // Convert gwei amounts to wei for total ETH value
+  return amountsGwei.reduce((sum, amountGwei) => sum + (amountGwei * BigInt(1e9)), 0n);
+}
+
+// Utility to convert gwei array to display-friendly ETH amounts
+export function gweiToEthStrings(amountsGwei: bigint[]): string[] {
+  return amountsGwei.map(gwei => (Number(gwei) / 1e9).toString());
 }
