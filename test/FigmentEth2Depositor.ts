@@ -86,4 +86,5 @@ describe("FigmentEth2Depositor", async function () {
       console.log("Expected failure due to mock deposit contract");
     }
   });
+
 });

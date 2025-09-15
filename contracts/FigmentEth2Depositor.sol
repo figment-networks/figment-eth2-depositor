@@ -24,9 +24,16 @@ contract FigmentEth2Depositor is Pausable, Ownable {
     IDepositContract public immutable depositContract;
 
     /**
-     * @dev Minimal and maximum amount of nodes per transaction.
+     * @dev Maximum amount of nodes per transaction.
+     *
+     * Analysis shows 250 validators is conservative and safe:
+     * - Gas usage: ~5.3M gas (well under 15-20M practical limits)
+     * - Transaction size: ~60KB (well under 128KB network limit)
+     * - Theoretical maximums: ~544 validators (size) or ~709+ validators (gas)
+     *
+     * We set the limit as 500 to be safe. That's a max of 1,024,000 ETH in one txn.
      */
-    uint256 public constant NODES_MAX_AMOUNT = 250; // Reasonable limit to prevent gas issues
+    uint256 public constant NODES_MAX_AMOUNT = 500;
     uint256 public constant PUBKEY_LENGTH = 48;
     uint256 public constant CREDENTIALS_LENGTH = 32;
     uint256 public constant SIGNATURE_LENGTH = 96;
@@ -34,17 +41,12 @@ contract FigmentEth2Depositor is Pausable, Ownable {
     /**
      * @dev Gwei to wei conversion factor.
      */
-    uint256 public constant GWEI_TO_WEI = 1_000_000_000; // 1e9
-
-    /**
-     * @dev Minimum collateral size of one node.
-     */
-    uint256 public constant MIN_COLLATERAL = 32 ether;
+    uint256 public constant GWEI_TO_WEI = 1 gwei; // 1e9
 
     /**
      * @dev Minimum collateral in gwei
      */
-    uint256 public constant MIN_COLLATERAL_GWEI = 32_000_000_000; // 32 * 1e9
+    uint256 public constant MIN_COLLATERAL_GWEI = 32_000_000_000; // 32 ETH in gwei
 
     /**
      * @dev Maximum collateral in gwei based on Ethereum protocol limits.
