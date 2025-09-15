@@ -35,38 +35,8 @@ export async function measureGas(
     });
     return gas;
   } catch (error: any) {
-    // Enhanced fallback estimation that differentiates between contract types
-    const baseGas = 21000n; // Base transaction cost
-    const validatorCount = Array.isArray(args[0]) ? BigInt(args[0].length) : 1n;
-
-    // Differentiate between legacy and new contracts based on argument count
-    const isNewContract = args.length === 5; // New contract has 5 args (including amounts)
-    const isLegacyContract = args.length === 4; // Legacy contract has 4 args
-
-    let perValidatorGas = 50000n; // Base gas per validator
-
-    if (isNewContract) {
-      // New contract has additional overhead:
-      // - Custom error checking (saves gas vs requires)
-      // - Amount validation and conversion
-      // - More complex parameter handling
-      perValidatorGas = 48000n; // Slightly more efficient due to custom errors
-      const amountProcessingGas = validatorCount * 2000n; // Additional gas for amount processing
-      const estimatedGas = baseGas + (validatorCount * perValidatorGas) + amountProcessingGas;
-      console.log(`Note: Using enhanced estimation for NEW contract (${estimatedGas}) - mock contract not available`);
-      return estimatedGas;
-    } else if (isLegacyContract) {
-      // Legacy contract with require statements
-      perValidatorGas = 52000n; // Less efficient due to require strings
-      const estimatedGas = baseGas + (validatorCount * perValidatorGas);
-      console.log(`Note: Using enhanced estimation for LEGACY contract (${estimatedGas}) - mock contract not available`);
-      return estimatedGas;
-    }
-
-    // Fallback for unknown contract types
-    const estimatedGas = baseGas + (validatorCount * perValidatorGas);
-    console.log(`Note: Using generic estimation (${estimatedGas}) due to mock contract`);
-    return estimatedGas;
+    // no fallback estimation
+    throw error;
   }
 }
 
