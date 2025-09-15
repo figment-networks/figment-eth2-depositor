@@ -46,13 +46,13 @@ contract FigmentEth2Depositor is Pausable, Ownable {
     /**
      * @dev Minimum collateral in gwei
      */
-    uint256 public constant MIN_COLLATERAL_GWEI = 32 ether;
+    uint256 public constant MIN_COLLATERAL_GWEI = 32_000_000_000; // 32 ETH in gwei
 
     /**
      * @dev Maximum collateral in gwei based on Ethereum protocol limits.
      * No validator can accept a deposit greater than 2048 ETH.
      */
-    uint256 public constant MAX_COLLATERAL_GWEI = 2048 ether;
+    uint256 public constant MAX_COLLATERAL_GWEI = 2_048_000_000_000; // 2048 ETH in gwei
 
     /**
      * @dev Setting Eth2 Smart Contract address during construction.
