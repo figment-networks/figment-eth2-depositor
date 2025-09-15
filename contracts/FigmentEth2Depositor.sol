@@ -27,6 +27,7 @@ contract FigmentEth2Depositor is Pausable, Ownable {
      * @dev Minimal and maximum amount of nodes per transaction.
      */
     uint256 public constant NODES_MIN_AMOUNT = 1;
+    uint256 public constant NODES_MAX_AMOUNT = 250; // Reasonable limit to prevent gas issues
     uint256 public constant PUBKEY_LENGTH = 48;
     uint256 public constant CREDENTIALS_LENGTH = 32;
     uint256 public constant SIGNATURE_LENGTH = 96;
@@ -45,6 +46,12 @@ contract FigmentEth2Depositor is Pausable, Ownable {
      * @dev Minimum collateral in gwei (precomputed to save gas).
      */
     uint256 public constant MIN_COLLATERAL_GWEI = 32_000_000_000; // 32 * 1e9
+
+    /**
+     * @dev Maximum collateral in gwei based on Ethereum protocol limits.
+     * No validator can accept a deposit greater than 2048 ETH.
+     */
+    uint256 public constant MAX_COLLATERAL_GWEI = 2_048_000_000_000; // 2048 ETH in gwei
 
     /**
      * @dev Setting Eth2 Smart Contract address during construction.
@@ -82,9 +89,9 @@ contract FigmentEth2Depositor is Pausable, Ownable {
 
         uint256 nodesAmount = pubkeys.length;
 
-        // Gas optimization: Single check for empty input
-        if (nodesAmount == 0) {
-            revert ParametersMismatch(1, 0);
+        // Gas optimization: Validate validator count bounds
+        if (nodesAmount == 0 || nodesAmount > NODES_MAX_AMOUNT) {
+            revert ParametersMismatch(nodesAmount, NODES_MAX_AMOUNT);
         }
 
         // Gas optimization: Combined length validation to reduce multiple checks
@@ -95,6 +102,8 @@ contract FigmentEth2Depositor is Pausable, Ownable {
             revert ParametersMismatch(nodesAmount, 0); // Use 0 as generic mismatch indicator
         }
 
+        // Note: totalAmount overflow is mathematically impossible within practical limits:
+        // Max per validator: 2048 ETH (~2e21 wei) × Max validators: 250 = ~5e23 wei << uint256.max (~1e77)
         uint256 totalAmount;
         unchecked {
             for (uint256 i; i < nodesAmount; ++i) {
@@ -103,6 +112,9 @@ contract FigmentEth2Depositor is Pausable, Ownable {
                 // Validate amounts first (most likely to fail fast)
                 if (amountGwei < MIN_COLLATERAL_GWEI) {
                     revert InsufficientAmount(amountGwei, MIN_COLLATERAL_GWEI);
+                }
+                if (amountGwei > MAX_COLLATERAL_GWEI) {
+                    revert InsufficientAmount(amountGwei, MAX_COLLATERAL_GWEI);
                 }
 
                 // Validate data lengths
@@ -126,12 +138,14 @@ contract FigmentEth2Depositor is Pausable, Ownable {
             revert EthAmountMismatch(msg.value, totalAmount);
         }
 
-        // Gas optimization: Deposit loop with unchecked arithmetic
+        // Gas optimization: Deposit loop with unchecked arithmetic where safe
         // Cache deposit contract to avoid repeated SLOAD
         IDepositContract cachedDepositContract = depositContract;
         unchecked {
             for (uint256 i; i < nodesAmount; ++i) {
+                // Safe due to MAX_COLLATERAL_GWEI validation above
                 uint256 amountWei = amountsGwei[i] * GWEI_TO_WEI;
+
                 cachedDepositContract.deposit{value: amountWei}(
                     pubkeys[i],
                     withdrawal_credentials[i],
