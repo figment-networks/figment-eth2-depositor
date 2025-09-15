@@ -7,10 +7,6 @@ settings:
 importers:
 
   .:
-    dependencies:
-      '@openzeppelin/contracts':
-        specifier: ^5.4.0
-        version: 5.4.0
     devDependencies:
       '@nomicfoundation/hardhat-ignition':
         specifier: ^3.0.0
@@ -18,6 +14,9 @@ importers:
       '@nomicfoundation/hardhat-toolbox-viem':
         specifier: ^5.0.0
         version: 5.0.0(nuv4jwnzkjc64hefx2oi3d5tda)
+      '@openzeppelin/contracts':
+        specifier: ^5.4.0
+        version: 5.4.0
       '@types/node':
         specifier: ^22.8.5
         version: 22.18.3
