@@ -26,7 +26,7 @@ contract FigmentEth2Depositor is Pausable, Ownable {
     /**
      * @dev Minimal and maximum amount of nodes per transaction.
      */
-    uint256 public constant NODES_MAX_AMOUNT = 250; // Reasonable limit to prevent gas issues
+    uint256 public constant NODES_MAX_AMOUNT = 250; // TODO: this is likely more than the max based on size of input data. Check this limit in practice.
     uint256 public constant PUBKEY_LENGTH = 48;
     uint256 public constant CREDENTIALS_LENGTH = 32;
     uint256 public constant SIGNATURE_LENGTH = 96;
@@ -116,6 +116,8 @@ contract FigmentEth2Depositor is Pausable, Ownable {
                     revert InsufficientAmount(amountGwei, MAX_COLLATERAL_GWEI);
                 }
 
+                 // TODO: check if 0x01 and max of 32 ETH ??
+
                 // Validate data lengths
                 if (pubkeys[i].length != PUBKEY_LENGTH) {
                     revert InvalidValidatorData(i, "pubkey");
@@ -143,6 +145,7 @@ contract FigmentEth2Depositor is Pausable, Ownable {
         unchecked {
             for (uint256 i; i < nodesAmount; ++i) {
                 // Safe due to MAX_COLLATERAL_GWEI validation above
+                // TODO: can we cast/implictly convert to wei here?
                 uint256 amountWei = amounts_gwei[i] * GWEI_TO_WEI;
 
                 cachedDepositContract.deposit{value: amountWei}(
