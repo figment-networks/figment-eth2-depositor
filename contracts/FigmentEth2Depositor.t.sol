@@ -8,6 +8,8 @@ contract FigmentEth2DepositorTest is Test {
   FigmentEth2Depositor depositor;
 
   function setUp() public {
-    depositor = new FigmentEth2Depositor();
+    // Mock deposit contract address for testing
+    address mockDepositContract = 0x00000000219ab540356cBB839Cbe05303d7705Fa;
+    depositor = new FigmentEth2Depositor(mockDepositContract);
   }
 }
