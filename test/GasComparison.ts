@@ -42,6 +42,8 @@ describe("Gas Cost Comparison: New vs Legacy", async function () {
       { validators: 5, description: "Small Batch (5 validators)" },
       { validators: 10, description: "Medium Batch (10 validators)" },
       { validators: 20, description: "Large Batch (20 validators)" },
+      { validators: 100, description: "Large Batch (100 validators)" },
+      { validators: 200, description: "Large Batch (200 validators)" },
     ];
 
     const results: Array<{
