@@ -48,32 +48,42 @@ contract FigmentEth2Depositor is Pausable, Ownable {
      * - withdrawal_credentials - Array of commitments to a public keys for withdrawals.
      * - signatures             - Array of BLS12-381 signatures.
      * - deposit_data_roots     - Array of the SHA-256 hashes of the SSZ-encoded DepositData objects.
+     * - amounts                - Array of deposit amounts in wei for each validator.
      */
     function deposit(
         bytes[] calldata pubkeys,
         bytes[] calldata withdrawal_credentials,
         bytes[] calldata signatures,
-        bytes32[] calldata deposit_data_roots
+        bytes32[] calldata deposit_data_roots,
+        uint256[] calldata amounts
     ) external payable whenNotPaused {
 
         uint256 nodesAmount = pubkeys.length;
 
         require(nodesAmount > 0, "1 node min / tx");
-        require(msg.value == collateral * nodesAmount, "ETH amount mismatch");
-
 
         require(
             withdrawal_credentials.length == nodesAmount &&
             signatures.length == nodesAmount &&
-            deposit_data_roots.length == nodesAmount,
+            deposit_data_roots.length == nodesAmount &&
+            amounts.length == nodesAmount,
             "Parameters mismatch");
+
+        // Calculate total expected ETH amount
+        uint256 totalAmount = 0;
+        for (uint256 i; i < nodesAmount; ++i) {
+            require(amounts[i] > 0, "Amount must be greater than 0");
+            totalAmount += amounts[i];
+        }
+
+        require(msg.value == totalAmount, "ETH amount mismatch");
 
         for (uint256 i; i < nodesAmount; ++i) {
             require(pubkeys[i].length == pubkeyLength, "Wrong pubkey");
             require(withdrawal_credentials[i].length == credentialsLength, "Wrong withdrawal cred");
             require(signatures[i].length == signatureLength, "Wrong signatures");
 
-            IDepositContract(address(depositContract)).deposit{value: collateral}(
+            IDepositContract(address(depositContract)).deposit{value: amounts[i]}(
                 pubkeys[i],
                 withdrawal_credentials[i],
                 signatures[i],
@@ -82,7 +92,7 @@ contract FigmentEth2Depositor is Pausable, Ownable {
 
         }
 
-        emit DepositEvent(msg.sender, nodesAmount);
+        emit DepositEvent(msg.sender, nodesAmount, totalAmount);
     }
 
     /**
@@ -107,5 +117,5 @@ contract FigmentEth2Depositor is Pausable, Ownable {
       _unpause();
     }
 
-    event DepositEvent(address from, uint256 nodesAmount);
+    event DepositEvent(address from, uint256 nodesAmount, uint256 totalAmount);
 }
