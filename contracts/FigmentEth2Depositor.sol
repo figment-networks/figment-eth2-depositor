@@ -3,7 +3,7 @@
 pragma solidity 0.8.10;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts/utils/Pausable.sol";
 import "../contracts/interfaces/IDepositContract.sol";
 
 contract FigmentEth2Depositor is Pausable, Ownable {
@@ -29,7 +29,7 @@ contract FigmentEth2Depositor is Pausable, Ownable {
     /**
      * @dev Setting Eth2 Smart Contract address during construction.
      */
-    constructor(address depositContract_) {
+    constructor(address depositContract_) Ownable(msg.sender) {
         require(depositContract_ != address(0), "Zero address");
         depositContract = IDepositContract(depositContract_);
     }
