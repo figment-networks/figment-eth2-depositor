@@ -118,8 +118,6 @@ contract FigmentEth2Depositor is Pausable, Ownable {
                     revert InsufficientAmount(amountGwei, MAX_COLLATERAL_GWEI);
                 }
 
-                 // TODO: check if 0x01 and max of 32 ETH ??
-
                 // Validate data lengths
                 if (pubkeys[i].length != PUBKEY_LENGTH) {
                     revert InvalidValidatorData(i, "pubkey");

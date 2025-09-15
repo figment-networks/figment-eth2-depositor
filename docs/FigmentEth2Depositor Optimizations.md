@@ -1,4 +1,33 @@
-# FigmentEth2Depositor
+# FigmentEth2Depositor Optimizations
+
+## Withdrawal Credentials Validation
+
+### 0x01 Withdrawal Credentials Deposit Limits - REJECTED
+
+**Status:** ❌ **Not Implemented** - Rejected due to gas cost impact
+
+#### Analysis
+
+We considered implementing validation for withdrawal credentials that start with `0x01` (ETH1 addresses) to enforce a maximum deposit of 32 ETH for these validators.
+
+#### Rationale for Consideration
+
+- **0x01 credentials:** Indicate ETH1 withdrawal addresses (execution layer addresses)
+- **Protocol compliance:** For ETH1 withdrawal addresses, deposits are typically limited to exactly 32 ETH
+- **Risk management:** Would prevent oversized deposits to validators with ETH1 withdrawal capabilities
+
+#### Why It Was Rejected
+
+**Gas Cost Impact:** +2% gas increase per transaction
+
+- Additional bytes comparison operations for each validator
+- Extra conditional logic in the main validation loop
+- Cost outweighs the protection benefit
+- Users can implement this validation at the application layer if needed
+
+#### Recommendation
+
+**Application-level validation** is preferred over smart contract validation for this use case, allowing users to maintain gas efficiency while still implementing the validation if required for their specific use case.
 
 ## Gas Optimization Analysis
 
@@ -40,14 +69,6 @@
    - Calldata savings from gwei: 36 gas per amount
    - MUL operation cost: ~10 gas per validator (2 operations × 5 gas)
    - **Net savings with gwei: 26 gas per validator**
-
-#### Recommendation
-
-✅ **Keep using gwei amounts.** The multiplication operations are negligible compared to the calldata savings from using smaller numbers with more leading zeros.
-
-The current implementation is already optimized! The apparent "inefficiency" of multiplication is actually more efficient than the alternative due to Ethereum's calldata pricing model.
-
----
 
 ## Transaction Size Limits
 
