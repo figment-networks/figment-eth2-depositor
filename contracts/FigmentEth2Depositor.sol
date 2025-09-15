@@ -32,9 +32,9 @@ contract FigmentEth2Depositor is Pausable, Ownable {
     uint256 public constant signatureLength = 96;
 
     /**
-     * @dev Collateral size of one node.
+     * @dev Minimum collateral size of one node.
      */
-    uint256 public constant collateral = 32 ether;
+    uint256 public constant minCollateral = 32 ether;
 
     /**
      * @dev Setting Eth2 Smart Contract address during construction.
@@ -92,8 +92,8 @@ contract FigmentEth2Depositor is Pausable, Ownable {
         // Calculate total expected ETH amount
         uint256 totalAmount = 0;
         for (uint256 i; i < nodesAmount; ++i) {
-            if (amounts[i] < collateral) {
-                revert InsufficientAmount(amounts[i], collateral);
+            if (amounts[i] < minCollateral) {
+                revert InsufficientAmount(amounts[i], minCollateral);
             }
             totalAmount += amounts[i];
         }
