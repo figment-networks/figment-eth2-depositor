@@ -50,9 +50,9 @@ pnpm hardhat ignition deploy --network sepolia ignition/modules/Counter.ts
 ```
 
 
-## FigmentEth2Depositor Contract
+## FigmentEth2Depositor0x01 Contract
 
-The Figment Eth2 Depositor provides a convenient way to send 1 or more deposits in one transaction to the Eth2 Deposit Contract.
+The Figment Eth2 Depositor provides a convenient way to send 1 or more deposits in one transaction to the Eth2 Deposit Contract when the deposit amount is 32 ETH for each validator.
 
 ### Contract Addresses
 
