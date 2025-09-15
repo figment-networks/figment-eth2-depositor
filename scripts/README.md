@@ -1,46 +1,26 @@
-# Event Monitoring Scripts
+# Analysis and Monitoring Scripts
 
-This directory contains scripts for monitoring and analyzing deposit events from the Ethereum 2.0 deposit contract.
+This directory contains scripts for gas analysis and event monitoring for the FigmentEth2Depositor contracts.
 
 ## Scripts Overview
 
-### 1. `monitor-deposit-events.ts`
-**Real-time event monitoring with filtering capabilities**
+### 1. `analyze-gas.ts`
+**Gas cost comparison between new and legacy contracts**
 
-Monitor deposit events from the Ethereum 2.0 deposit contract in real-time. Can filter events to only show those originating from your Figment contract.
-
-```bash
-# Monitor all deposit events from mainnet
-npx hardhat run scripts/monitor-deposit-events.ts
-
-# Monitor only events from your deployed Figment contract
-npx hardhat run scripts/monitor-deposit-events.ts \
-  --figment-contract=0x123... \
-  --from-block=19000000
-
-# Monitor mock contract for testing
-npx hardhat run scripts/monitor-deposit-events.ts \
-  --deposit-contract=0x456... \
-  --figment-contract=0x789...
-```
-
-**Options:**
-- `--deposit-contract=ADDRESS` - Deposit contract to monitor (default: mainnet)
-- `--figment-contract=ADDRESS` - Filter events only from this Figment contract
-- `--from-block=NUMBER` - Start monitoring from this block (default: 0)
-- `--help` - Show help message
-
-### 2. `check-transaction-events.ts`
-**Analyze events from a specific transaction**
-
-Check what deposit events were emitted by a specific transaction. Useful for verifying deposits after making a transaction.
+Analyzes and compares gas costs between the new `FigmentEth2Depositor` (variable amounts) and legacy `FigmentEth2Depositor0x01` (fixed 32 ETH) contracts. Provides detailed gas usage reports with cost calculations.
 
 ```bash
-# Check events from a specific transaction
-npx hardhat run scripts/check-transaction-events.ts 0x1234567890abcdef...
+# Run gas analysis comparison
+npx hardhat run scripts/analyze-gas.ts
 ```
 
-### 3. `demo-event-monitoring.ts`
+**Features:**
+- Deploys mock contracts for testing
+- Compares single and multiple validator scenarios
+- Shows gas usage, percentage differences, and USD cost estimates
+- Uses configurable gas price and ETH price for cost calculations
+
+### 2. `demo-event-monitoring.ts`
 **Interactive demo of event monitoring**
 
 Deploys test contracts, makes a deposit transaction, and demonstrates how to monitor the resulting events.
@@ -48,6 +28,59 @@ Deploys test contracts, makes a deposit transaction, and demonstrates how to mon
 ```bash
 # Run the interactive demo
 npx hardhat run scripts/demo-event-monitoring.ts
+```
+
+## Example Outputs
+
+### Gas Analysis Output
+```
+🔥 Gas Analysis Tool 🔥
+
+✅ Mock Deposit Contract deployed at: 0x5fbdb...
+✅ New Contract deployed at: 0xe7f17...
+✅ Legacy Contract deployed at: 0x9fe46...
+
+📊 Single Validator
+──────────────────────────────────────────────────
+Legacy Gas:     71,223 gas
+New Gas:        72,756 gas
+Difference:     +1,533 gas
+% Change:       +2.00%
+🔴 Gas Increase: 1,533 gas
+💸 Cost Increase: $0.091980
+
+📊 Multiple Validators (5)
+──────────────────────────────────────────────────
+Using gwei amounts: [32, 34, 36, 38, 40] ETH
+Legacy Gas:     153,471 gas
+New Gas:        157,068 gas
+Difference:     +3,597 gas
+% Change:       +2.00%
+🔴 Gas Increase: 3,597 gas
+💸 Cost Increase: $0.215820
+
+✅ Gas analysis complete!
+```
+
+### Event Monitoring Output
+```
+🔸 Deposit Event #1
+────────────────────────────────────────
+Contract:   0x5fbdb2315678afecb367f032d93f642f64180aa3
+Validator Index: 1
+Amount:     32000000000 gwei (32 ETH)
+Pubkey:     0x1234...abcd
+Withdrawal: 0x01234...5678
+Signature:  0xabcd...1234
+────────────────────────────────────────
+
+🔸 Figment Event #1
+────────────────────────────────────────
+Contract:    0xe7f1725e7734ce288f8367e1bb143e90bb3f0512
+From:        0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Nodes:       3
+Total:       107000000000000000000 wei (107 ETH)
+────────────────────────────────────────
 ```
 
 ## Event Data Structure
@@ -64,7 +97,7 @@ event DepositEvent(
 );
 ```
 
-Your Figment contract also emits its own event:
+The Figment contract also emits its own event:
 
 ```solidity
 event DepositEvent(
@@ -76,58 +109,37 @@ event DepositEvent(
 
 ## Use Cases
 
-### 1. **Transaction Verification**
-After making deposits through your Figment contract, use `check-transaction-events.ts` to verify that the correct number of deposit events were emitted.
+### 1. **Gas Cost Analysis**
+Use `analyze-gas.ts` to compare gas costs between different contract implementations and validate optimization decisions.
 
-### 2. **Real-time Monitoring**
-Use `monitor-deposit-events.ts` with filtering to track when your contract makes deposits to the beacon chain.
+### 2. **Transaction Verification**
+Use `demo-event-monitoring.ts` to verify that deposits emit the correct events and understand how event parsing works.
 
-### 3. **Analytics and Reporting**
-Parse the event data to build analytics on your staking operations:
-- Track total ETH staked
-- Monitor validator indices
-- Verify withdrawal credentials
+### 3. **Development and Testing**
+Both scripts help during development to:
+- Validate contract behavior
+- Understand gas implications of design decisions
+- Test event emission and parsing
+- Compare different implementations
 
-### 4. **Debugging**
-When transactions fail or behave unexpectedly, check the events to understand what happened.
+### 4. **Integration Testing**
+The demo script shows how to integrate event monitoring into your applications for real-time tracking of deposit operations.
 
-## Example Output
+## Configuration
 
-```
-🔸 New Deposit Event
-──────────────────────────────────────────────────
-Block:      19234567
-Tx Hash:    0x1234...abcd
-Log Index:  42
-Validator Index: 12345
-Amount:     32000000000 gwei (32 ETH)
-Pubkey:     0x1234...abcd
-Withdrawal: 0x01234...5678
-Signature:  0xabcd...1234
-──────────────────────────────────────────────────
-```
+Both scripts use your Hardhat network configuration. For mainnet use, ensure you have:
+- Proper RPC endpoint configuration
+- Sufficient ETH for gas fees (analyze-gas.ts deploys contracts)
+- Appropriate gas price settings
 
-## Network Configuration
-
-The scripts automatically use the network configuration from your Hardhat config. Make sure you have the appropriate network settings for:
-
-- **Mainnet**: Monitor real deposit contract (`0x00000000219ab540356cBB839Cbe05303d7705Fa`)
-- **Testnet**: Monitor testnet deposit contracts
-- **Local**: Monitor your deployed mock contracts
-
-## Tips
-
-1. **Gas Costs**: Monitoring events is read-only and doesn't cost gas
-2. **Rate Limits**: Be mindful of RPC rate limits when monitoring mainnet
-3. **Block Ranges**: Use `--from-block` to avoid scanning the entire chain
-4. **Filtering**: Always filter by your contract address to reduce noise
-5. **Real-time**: The monitor script runs continuously until you press Ctrl+C
+The gas analysis uses configurable parameters:
+- Gas price: 20 gwei (configurable in GasReporter)
+- ETH price: $3000 (configurable in GasReporter)
 
 ## Integration
 
 These scripts can be integrated into:
-- CI/CD pipelines for testing
-- Monitoring dashboards
-- Alert systems
-- Data analytics platforms
-- Validator management tools
+- CI/CD pipelines for gas regression testing
+- Development workflows for contract validation
+- Monitoring systems for production deployments
+- Analytics dashboards for cost tracking

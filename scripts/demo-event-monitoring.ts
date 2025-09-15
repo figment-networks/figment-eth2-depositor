@@ -1,5 +1,5 @@
 import { network } from "hardhat";
-import { parseGwei, parseEther, encodeFunctionData, parseAbiItem, decodeEventLog } from "viem";
+import { parseGwei, encodeFunctionData, parseAbiItem, decodeEventLog } from "viem";
 import { generateValidatorData } from "../test/utils/testHelpers.js";
 
 // Event signatures
@@ -183,12 +183,6 @@ async function demoEventMonitoring() {
   }
 
   console.log("🎉 Demo completed successfully!");
-  console.log("");
-  console.log("💡 Next steps:");
-  console.log("1. Use scripts/monitor-deposit-events.ts to monitor real-time events");
-  console.log("2. Use scripts/check-transaction-events.ts to analyze specific transactions");
-  console.log(`3. Monitor this mock contract: ${mockDepositContract.address}`);
-  console.log(`4. Filter events from this Figment contract: ${figmentContract.address}`);
 }
 
 async function main() {
