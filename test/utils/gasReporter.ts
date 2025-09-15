@@ -22,7 +22,7 @@ export class GasReporter {
   private results: GasComparisonResult[] = [];
 
   constructor(gasPriceGwei: number = 20, ethPriceUSD: number = 3000) {
-    this.gasPrice = parseEther(gasPriceGwei.toString()) / parseEther("1000000000"); // Convert gwei to wei
+    this.gasPrice = BigInt(gasPriceGwei * 1e9); // Convert gwei to wei directly
     this.ethPriceUSD = ethPriceUSD;
   }
 

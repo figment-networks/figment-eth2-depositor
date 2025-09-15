@@ -9,14 +9,17 @@ async function main() {
 
   console.log("🔥 Gas Analysis Tool 🔥\n");
 
-  // Mock deposit contract
-  const mockDepositContract = "0x00000000219ab540356cBB839Cbe05303d7705Fa";
-
   // Initialize gas reporter
   const gasReporter = new GasReporter(20, 3000); // 20 gwei, $3000 ETH
 
+  // Deploy mock deposit contract first
+  console.log("Deploying mock deposit contract...");
+  const mockContract = await viem.deployContract("MockDepositContract", []);
+  const mockDepositContract = mockContract.address;
+  console.log(`✅ Mock Deposit Contract deployed at: ${mockDepositContract}\n`);
+
   // Deploy contracts
-  console.log("Deploying contracts...");
+  console.log("Deploying test contracts...");
   const newContract = await viem.deployContract("FigmentEth2Depositor", [mockDepositContract]);
   const legacyContract = await viem.deployContract("FigmentEth2Depositor0x01", [mockDepositContract]);
 

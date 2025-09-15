@@ -10,14 +10,24 @@ describe("Gas Cost Comparison: New vs Legacy", async function () {
   const { viem } = await network.connect();
   const publicClient = await viem.getPublicClient();
 
-  // Mock deposit contract address (for testing)
-  const mockDepositContract = "0x00000000219ab540356cBB839Cbe05303d7705Fa";
+  // Deploy a real mock deposit contract for accurate gas measurement
+  let mockDepositContract: `0x${string}`;
+
+  async function deployMockDepositContract() {
+    const mockContract = await viem.deployContract("MockDepositContract", []);
+    return mockContract.address;
+  }
 
   // Initialize gas reporter
   const gasReporter = new GasReporter(20, 3000); // 20 gwei, $3000 ETH
 
   async function runGasComparison() {
     console.log("\n🔥 GAS COMPARISON ANALYSIS 🔥\n");
+
+    // Deploy mock deposit contract first
+    console.log("Deploying mock deposit contract...");
+    mockDepositContract = await deployMockDepositContract();
+    console.log(`✅ Mock Deposit Contract deployed at: ${mockDepositContract}\n`);
 
     // Deploy both contracts
     const newContract = await viem.deployContract("FigmentEth2Depositor", [mockDepositContract]);
@@ -118,9 +128,12 @@ describe("Gas Cost Comparison: New vs Legacy", async function () {
     console.log("\n🏗️  DEPLOYMENT GAS COMPARISON");
     console.log("═".repeat(50));
 
+    // Deploy mock deposit contract for this test
+    const testMockContract = await deployMockDepositContract();
+
     // Get deployment gas estimates
-    const newDeployment = await viem.deployContract("FigmentEth2Depositor", [mockDepositContract]);
-    const legacyDeployment = await viem.deployContract("FigmentEth2Depositor0x01", [mockDepositContract]);
+    const newDeployment = await viem.deployContract("FigmentEth2Depositor", [testMockContract]);
+    const legacyDeployment = await viem.deployContract("FigmentEth2Depositor0x01", [testMockContract]);
 
     // Get contract bytecode sizes
     const newBytecode = await publicClient.getCode({ address: newDeployment.address });
