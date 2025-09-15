@@ -67,7 +67,7 @@ Below is a list of contracts we use for this service:
 </dl>
 
 <dl>
-  <dt>FigmentEth2Depositor</dt>
+  <dt>FigmentEth2Depositor0x01</dt>
   <dd>A smart contract that accepts X amount of ETH and sends {x / 32} transactions with required collateral (32 ETH) to the Eth2 Deposit Contract.</dd>
 </dl>
 
