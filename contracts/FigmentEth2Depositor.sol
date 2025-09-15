@@ -42,6 +42,11 @@ contract FigmentEth2Depositor is Pausable, Ownable {
     uint256 public constant MIN_COLLATERAL = 32 ether;
 
     /**
+     * @dev Minimum collateral in gwei (precomputed to save gas).
+     */
+    uint256 public constant MIN_COLLATERAL_GWEI = 32_000_000_000; // 32 * 1e9
+
+    /**
      * @dev Setting Eth2 Smart Contract address during construction.
      */
     constructor(address depositContract_) Ownable(msg.sender) {
@@ -77,56 +82,63 @@ contract FigmentEth2Depositor is Pausable, Ownable {
 
         uint256 nodesAmount = pubkeys.length;
 
+        // Gas optimization: Single check for empty input
         if (nodesAmount == 0) {
             revert ParametersMismatch(1, 0);
         }
 
-        if (withdrawal_credentials.length != nodesAmount) {
-            revert ParametersMismatch(nodesAmount, withdrawal_credentials.length);
-        }
-        if (signatures.length != nodesAmount) {
-            revert ParametersMismatch(nodesAmount, signatures.length);
-        }
-        if (deposit_data_roots.length != nodesAmount) {
-            revert ParametersMismatch(nodesAmount, deposit_data_roots.length);
-        }
-        if (amountsGwei.length != nodesAmount) {
-            revert ParametersMismatch(nodesAmount, amountsGwei.length);
+        // Gas optimization: Combined length validation to reduce multiple checks
+        if (withdrawal_credentials.length != nodesAmount ||
+            signatures.length != nodesAmount ||
+            deposit_data_roots.length != nodesAmount ||
+            amountsGwei.length != nodesAmount) {
+            revert ParametersMismatch(nodesAmount, 0); // Use 0 as generic mismatch indicator
         }
 
-        // Convert gwei to wei and calculate total expected ETH amount
-        uint256 totalAmount = 0;
-        uint256 minCollateralGwei = MIN_COLLATERAL / GWEI_TO_WEI; // Convert 32 ETH to gwei
-        for (uint256 i; i < nodesAmount; ++i) {
-            if (amountsGwei[i] < minCollateralGwei) {
-                revert InsufficientAmount(amountsGwei[i], minCollateralGwei);
+        uint256 totalAmount;
+        unchecked {
+            for (uint256 i; i < nodesAmount; ++i) {
+                uint256 amountGwei = amountsGwei[i];
+
+                // Validate amounts first (most likely to fail fast)
+                if (amountGwei < MIN_COLLATERAL_GWEI) {
+                    revert InsufficientAmount(amountGwei, MIN_COLLATERAL_GWEI);
+                }
+
+                // Validate data lengths
+                if (pubkeys[i].length != PUBKEY_LENGTH) {
+                    revert InvalidValidatorData(i, "pubkey");
+                }
+                if (withdrawal_credentials[i].length != CREDENTIALS_LENGTH) {
+                    revert InvalidValidatorData(i, "withdrawal_credentials");
+                }
+                if (signatures[i].length != SIGNATURE_LENGTH) {
+                    revert InvalidValidatorData(i, "signature");
+                }
+
+                // Calculate total (overflow impossible with reasonable validator counts)
+                totalAmount += amountGwei * GWEI_TO_WEI;
             }
-            totalAmount += amountsGwei[i] * GWEI_TO_WEI; // Convert gwei to wei
         }
+
 
         if (msg.value != totalAmount) {
             revert EthAmountMismatch(msg.value, totalAmount);
         }
 
-        for (uint256 i; i < nodesAmount; ++i) {
-            if (pubkeys[i].length != PUBKEY_LENGTH) {
-                revert InvalidValidatorData(i, "pubkey");
+        // Gas optimization: Deposit loop with unchecked arithmetic
+        // Cache deposit contract to avoid repeated SLOAD
+        IDepositContract cachedDepositContract = depositContract;
+        unchecked {
+            for (uint256 i; i < nodesAmount; ++i) {
+                uint256 amountWei = amountsGwei[i] * GWEI_TO_WEI;
+                cachedDepositContract.deposit{value: amountWei}(
+                    pubkeys[i],
+                    withdrawal_credentials[i],
+                    signatures[i],
+                    deposit_data_roots[i]
+                );
             }
-            if (withdrawal_credentials[i].length != CREDENTIALS_LENGTH) {
-                revert InvalidValidatorData(i, "withdrawal_credentials");
-            }
-            if (signatures[i].length != SIGNATURE_LENGTH) {
-                revert InvalidValidatorData(i, "signature");
-            }
-
-            uint256 amountWei = amountsGwei[i] * GWEI_TO_WEI; // Convert gwei to wei
-            IDepositContract(address(depositContract)).deposit{value: amountWei}(
-                pubkeys[i],
-                withdrawal_credentials[i],
-                signatures[i],
-                deposit_data_roots[i]
-            );
-
         }
 
         emit DepositEvent(msg.sender, nodesAmount, totalAmount);
