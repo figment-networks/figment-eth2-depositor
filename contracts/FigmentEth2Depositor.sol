@@ -83,7 +83,7 @@ contract FigmentEth2Depositor is Pausable, Ownable {
         bytes[] calldata withdrawal_credentials,
         bytes[] calldata signatures,
         bytes32[] calldata deposit_data_roots,
-        uint256[] calldata amountsGwei
+        uint256[] calldata amounts_gwei
     ) external payable whenNotPaused {
 
         uint256 nodesAmount = pubkeys.length;
@@ -97,7 +97,7 @@ contract FigmentEth2Depositor is Pausable, Ownable {
         if (withdrawal_credentials.length != nodesAmount ||
             signatures.length != nodesAmount ||
             deposit_data_roots.length != nodesAmount ||
-            amountsGwei.length != nodesAmount) {
+            amounts_gwei.length != nodesAmount) {
             revert ParametersMismatch(nodesAmount, 0); // Use 0 as generic mismatch indicator
         }
 
@@ -106,7 +106,7 @@ contract FigmentEth2Depositor is Pausable, Ownable {
         uint256 totalAmount;
         unchecked {
             for (uint256 i; i < nodesAmount; ++i) {
-                uint256 amountGwei = amountsGwei[i];
+                uint256 amountGwei = amounts_gwei[i];
 
                 // Validate amounts first (most likely to fail fast)
                 if (amountGwei < MIN_COLLATERAL_GWEI) {
@@ -143,7 +143,7 @@ contract FigmentEth2Depositor is Pausable, Ownable {
         unchecked {
             for (uint256 i; i < nodesAmount; ++i) {
                 // Safe due to MAX_COLLATERAL_GWEI validation above
-                uint256 amountWei = amountsGwei[i] * GWEI_TO_WEI;
+                uint256 amountWei = amounts_gwei[i] * GWEI_TO_WEI;
 
                 cachedDepositContract.deposit{value: amountWei}(
                     pubkeys[i],
