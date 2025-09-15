@@ -1,0 +1,58 @@
+{
+  "human_readable_abi": [
+    "function deposit(bytes[] pubkeys, bytes[] withdrawal_credentials, bytes[] signatures, bytes32[] deposit_data_roots, uint256[] amounts_gwei) payable",
+    "function pause() onlyOwner",
+    "function unpause() onlyOwner",
+    "function paused() view returns (bool)",
+    "function owner() view returns (address)",
+    "function depositContract() view returns (address)",
+    "event DepositEvent(address indexed from, uint256 nodesAmount, uint256 totalAmount)"
+  ],
+  "function_descriptions": {
+    "deposit": {
+      "title": "Create Ethereum 2.0 Validators",
+      "summary": "Stake ETH to create multiple validators on Ethereum 2.0",
+      "details": "This transaction will create {count} validators with a total stake of {total_eth} ETH. Each validator will have custom amounts and withdrawal credentials.",
+      "risks": [
+        "ETH will be locked until Ethereum 2.0 withdrawals are enabled",
+        "Validators are subject to slashing conditions",
+        "Invalid validator data may result in loss of funds"
+      ]
+    },
+    "pause": {
+      "title": "Pause Contract",
+      "summary": "Temporarily disable new deposits",
+      "details": "Prevents new validator deposits until unpaused. Only the contract owner can perform this action."
+    },
+    "unpause": {
+      "title": "Unpause Contract",
+      "summary": "Re-enable deposits",
+      "details": "Allows new validator deposits again. Only the contract owner can perform this action."
+    }
+  },
+  "parameter_formatting": {
+    "amounts_gwei": {
+      "display_as": "ETH",
+      "conversion": "value / 1e9",
+      "format": "{value} ETH",
+      "validation_display": "Between 32 ETH and 2048 ETH"
+    },
+    "pubkeys": {
+      "display_as": "Validator Keys",
+      "format": "0x{first_8_chars}...{last_8_chars}",
+      "count_display": "{count} validator public keys"
+    },
+    "withdrawal_credentials": {
+      "display_as": "Withdrawal Addresses",
+      "interpretation": {
+        "0x00": "BLS Withdrawal Key",
+        "0x01": "Execution Address: 0x{last_20_bytes}"
+      }
+    }
+  },
+  "value_formatting": {
+    "display_as": "Total Stake Amount",
+    "format": "{value} ETH",
+    "calculation_note": "Sum of all validator amounts"
+  }
+}
