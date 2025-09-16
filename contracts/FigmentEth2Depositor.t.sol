@@ -646,7 +646,7 @@ contract FigmentEth2DepositorTest is Test {
     }
 
     function test_Deposit_MaximumValidators_Success() public {
-        uint256 validatorCount = 250; // Maximum allowed
+        uint256 validatorCount = 500; // Maximum allowed
         bytes[] memory pubkeys = new bytes[](validatorCount);
         bytes[] memory withdrawalCredentials = new bytes[](validatorCount);
         bytes[] memory signatures = new bytes[](validatorCount);
