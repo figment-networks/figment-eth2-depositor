@@ -31,7 +31,7 @@ describe("Gas Cost Comparison: New vs Legacy", async function () {
 
     // Deploy both contracts
     const newContract = await viem.deployContract("FigmentEth2DepositorPectra", [mockDepositContract]);
-    const legacyContract = await viem.deployContract("FigmentEth2Depositor0x01", [mockDepositContract]);
+    const legacyContract = await viem.deployContract("FigmentEth2Depositor", [mockDepositContract]);
 
     console.log("Contracts deployed:");
     console.log(`  New Contract: ${newContract.address}`);
@@ -135,7 +135,7 @@ describe("Gas Cost Comparison: New vs Legacy", async function () {
 
     // Get deployment gas estimates
     const newDeployment = await viem.deployContract("FigmentEth2DepositorPectra", [testMockContract]);
-    const legacyDeployment = await viem.deployContract("FigmentEth2Depositor0x01", [testMockContract]);
+    const legacyDeployment = await viem.deployContract("FigmentEth2Depositor", [testMockContract]);
 
     // Get contract bytecode sizes
     const newBytecode = await publicClient.getCode({ address: newDeployment.address });
