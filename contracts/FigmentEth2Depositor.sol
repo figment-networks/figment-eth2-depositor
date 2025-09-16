@@ -108,7 +108,7 @@ contract FigmentEth2Depositor is Pausable, Ownable {
         if (withdrawal_credentials.length != nodesAmount ||
             signatures.length != nodesAmount ||
             deposit_data_roots.length != nodesAmount ||
-            amounts_gwei.length != nodesAmount) { 
+            amounts_gwei.length != nodesAmount) {
             revert ParametersMismatch(nodesAmount, 0); // Use 0 as generic mismatch indicator
         }
 
@@ -156,10 +156,10 @@ contract FigmentEth2Depositor is Pausable, Ownable {
                 uint256 amountWei = amounts_gwei[i] * GWEI_TO_WEI;
 
                 cachedDepositContract.deposit{value: amountWei}(
-                  pubkeys[i],
-                  withdrawal_credentials[i],
-                  signatures[i],
-                  deposit_data_roots[i]
+                    pubkeys[i],
+                    withdrawal_credentials[i],
+                    signatures[i],
+                    deposit_data_roots[i]
               );
             }
         }
