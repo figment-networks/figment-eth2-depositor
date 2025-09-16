@@ -1,4 +1,11 @@
 {
+  "$schema": "https://raw.githubusercontent.com/LedgerHQ/clear-signing-erc7730-registry/master/schemas/erc7730.schema.json",
+  "metadata": {
+    "name": "FigmentEth2Depositor ABI Definitions",
+    "description": "Human-readable ABI and function descriptions for FigmentEth2Depositor contract",
+    "version": "1.0.0",
+    "erc7730_compatible": true
+  },
   "human_readable_abi": [
     "function deposit(bytes[] pubkeys, bytes[] withdrawal_credentials, bytes[] signatures, bytes32[] deposit_data_roots, uint256[] amounts_gwei) payable",
     "function pause() onlyOwner",
@@ -12,7 +19,8 @@
     "deposit": {
       "title": "Create Ethereum 2.0 Validators",
       "summary": "Stake ETH to create multiple validators on Ethereum 2.0",
-      "details": "This transaction will create {count} validators with a total stake of {total_eth} ETH. Each validator will have custom amounts and withdrawal credentials.",
+      "details": "This transaction will create validators with custom amounts and withdrawal credentials. The ERC-7730 clear signing descriptor provides enhanced display formatting for wallet integration.",
+      "erc7730_intent": "Stake {{amounts_gwei.length}} validators with total {{msg.value}} ETH on Ethereum 2.0",
       "risks": [
         "ETH will be locked until Ethereum 2.0 withdrawals are enabled",
         "Validators are subject to slashing conditions",
@@ -22,37 +30,73 @@
     "pause": {
       "title": "Pause Contract",
       "summary": "Temporarily disable new deposits",
-      "details": "Prevents new validator deposits until unpaused. Only the contract owner can perform this action."
+      "details": "Prevents new validator deposits until unpaused. Only the contract owner can perform this action.",
+      "erc7730_intent": "Pause the FigmentEth2Depositor contract"
     },
     "unpause": {
       "title": "Unpause Contract",
       "summary": "Re-enable deposits",
-      "details": "Allows new validator deposits again. Only the contract owner can perform this action."
+      "details": "Allows new validator deposits again. Only the contract owner can perform this action.",
+      "erc7730_intent": "Unpause the FigmentEth2Depositor contract"
     }
   },
-  "parameter_formatting": {
+  "erc7730_field_mappings": {
+    "deposit": {
+      "amounts_gwei": {
+        "label": "Individual Stakes",
+        "format": "gwei_to_eth",
+        "description": "Deposit amounts converted from gwei to ETH for display"
+      },
+      "pubkeys": {
+        "label": "Validator Keys",
+        "format": "validator_pubkey",
+        "description": "BLS public keys for validators (48 bytes each)"
+      },
+      "withdrawal_credentials": {
+        "label": "Withdrawal Addresses",
+        "format": "withdrawal_credentials",
+        "description": "Withdrawal credentials (32 bytes each)"
+      },
+      "signatures": {
+        "label": "Signatures",
+        "format": "signature",
+        "description": "BLS signatures proving key ownership (96 bytes each)"
+      },
+      "deposit_data_roots": {
+        "label": "Data Roots",
+        "format": "data_root",
+        "description": "Merkle roots of deposit data for verification (32 bytes each)"
+      }
+    }
+  },
+  "legacy_parameter_formatting": {
     "amounts_gwei": {
       "display_as": "ETH",
       "conversion": "value / 1e9",
       "format": "{value} ETH",
-      "validation_display": "Between 32 ETH and 2048 ETH"
+      "validation_display": "Between 32 ETH and 2048 ETH",
+      "note": "Legacy format - use ERC-7730 descriptor for modern wallets"
     },
     "pubkeys": {
       "display_as": "Validator Keys",
       "format": "0x{first_8_chars}...{last_8_chars}",
-      "count_display": "{count} validator public keys"
+      "count_display": "{count} validator public keys",
+      "note": "Legacy format - use ERC-7730 descriptor for modern wallets"
     },
     "withdrawal_credentials": {
       "display_as": "Withdrawal Addresses",
       "interpretation": {
         "0x00": "BLS Withdrawal Key",
         "0x01": "Execution Address: 0x{last_20_bytes}"
-      }
+      },
+      "note": "Legacy format - use ERC-7730 descriptor for modern wallets"
     }
   },
   "value_formatting": {
     "display_as": "Total Stake Amount",
     "format": "{value} ETH",
-    "calculation_note": "Sum of all validator amounts"
+    "calculation_note": "Sum of all validator amounts",
+    "erc7730_path": "msg.value",
+    "erc7730_format": "gwei_to_eth"
   }
 }

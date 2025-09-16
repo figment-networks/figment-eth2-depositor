@@ -1,81 +1,165 @@
-# Clear Signing Integration Guide
+# ERC-7730 Clear Signing Integration Guide
 
-This guide helps wallet developers integrate clear signing support for the FigmentEth2Depositor contract.
+This guide helps wallet developers integrate ERC-7730 compliant clear signing support for the FigmentEth2Depositor contract.
 
 ## Overview
 
-The FigmentEth2Depositor contract creates multiple Ethereum 2.0 validators in a single transaction with custom stake amounts. Clear signing should help users understand:
+The FigmentEth2Depositor contract creates multiple Ethereum 2.0 validators in a single transaction with custom stake amounts. This guide provides ERC-7730 standard implementation details for enhanced clear signing. The ERC-7730 format provides standardized metadata that helps users understand:
 
 1. **What they're doing**: Creating Ethereum 2.0 validators
 2. **How much they're staking**: Total ETH and per-validator amounts
 3. **Where rewards go**: Withdrawal credentials interpretation
 4. **Risks involved**: Lockup period, slashing, etc.
 
-## Transaction Display Recommendations
+## ERC-7730 Standard Compliance
 
-### Primary Display
+This implementation follows the [ERC-7730 draft specification](https://github.com/LedgerHQ/clear-signing-erc7730-registry/blob/master/specs/erc-7730.md) for standardized clear signing descriptors. The specification provides:
+
+- **Context Binding**: Ensures descriptors are applied only to relevant transactions
+- **Display Formats**: Standardized field formatting and labeling
+- **Intent Declarations**: Human-readable transaction purposes
+- **Security Considerations**: Protection against malicious descriptor attacks
+
+## ERC-7730 Descriptor Integration
+
+### Descriptor Location
+The ERC-7730 descriptor is located at:
+- **File**: `/metadata/clear-signing-descriptor.json`
+- **Schema**: `https://raw.githubusercontent.com/LedgerHQ/clear-signing-erc7730-registry/master/schemas/erc7730.schema.json`
+
+### Intent-Based Display
+The ERC-7730 intent provides high-level transaction understanding:
 ```
-🔥 Create Ethereum 2.0 Validators
+Stake {{amounts_gwei.length}} validators with total {{msg.value}} ETH on Ethereum 2.0
+```
+
+This resolves to user-friendly text like:
+```
+🔥 Stake 3 validators with total 107 ETH on Ethereum 2.0
+```
+
+### Field-Level Display Formatting
+
+The descriptor defines how each parameter should be displayed:
+
+#### Primary Fields
+```json
+{
+  "path": "amounts_gwei.length",
+  "label": "Validators",
+  "format": "validator_count"
+}
+```
+
+#### Amount Formatting
+```json
+{
+  "path": "msg.value",
+  "label": "Total Stake",
+  "format": "gwei_to_eth"
+}
+```
+
+#### Array Field Display
+```json
+{
+  "path": "amounts_gwei.*",
+  "label": "Individual Stakes",
+  "format": "gwei_to_eth"
+}
+```
+
+### Recommended Display Layout
+```
+🔥 Stake 3 validators with total 107 ETH on Ethereum 2.0
 
 Validators: 3
 Total Stake: 107 ETH
 Individual Stakes: 32 ETH, 35 ETH, 40 ETH
+
+Validator Keys:
+  0x1234...abcd
+  0x2345...bcde
+  0x3456...cdef
+
+Withdrawal Addresses:
+  0x5678...efgh (Execution Address)
+  0x6789...fghi (BLS Key)
+  0x789a...ghij (Execution Address)
 ```
 
-### Detailed Breakdown
+### Security Warnings
+ERC-7730 descriptors include standardized warnings:
 ```
-Validator 1:
-  Stake: 32 ETH
-  Public Key: 0x1234...abcd
-  Withdrawal: Execution Address (0x5678...efgh)
-
-Validator 2:
-  Stake: 35 ETH
-  Public Key: 0x2345...bcde
-  Withdrawal: BLS Key (0x6789...fghi)
-
-Validator 3:
-  Stake: 40 ETH
-  Public Key: 0x3456...cdef
-  Withdrawal: Execution Address (0x789a...ghij)
-```
-
-### Risk Warnings
-```
-⚠️  Important Considerations:
+⚠️  Security Considerations:
 • ETH will be locked until Ethereum 2.0 withdrawals are enabled
-• Validators are subject to slashing conditions (potential loss)
+• Validators are subject to slashing conditions
 • Minimum 32 ETH required per validator
-• Invalid data may result in permanent loss
+• Invalid validator data may result in permanent loss
 ```
 
-## Parameter Interpretation
+## ERC-7730 Format Specifications
 
-### `amounts_gwei` (uint256[])
-- **Display**: Convert to ETH by dividing by 1e9
-- **Format**: "{value} ETH"
-- **Validation**: Show warning if < 32 ETH or > 2048 ETH
-- **Example**: `32000000000` → "32 ETH"
+### Currency Amount Formatting
+```json
+"gwei_to_eth": {
+  "type": "amount",
+  "currency": {
+    "type": "native"
+  },
+  "multiplier": "1000000000"
+}
+```
+- Converts gwei values to ETH display
+- Example: `32000000000` → "32 ETH"
 
-### `withdrawal_credentials` (bytes[])
-- **First byte `0x00`**: "BLS Withdrawal Key"
-- **First byte `0x01`**: "Execution Address: 0x{last 20 bytes}"
-- **Format**: Truncate long addresses with "0x1234...abcd"
+### Raw Data Formatting
+```json
+"validator_pubkey": {
+  "type": "raw",
+  "params": {
+    "encoding": "bytes48"
+  }
+}
+```
+- Formats 48-byte BLS public keys
+- Display: "0x{first_8_chars}...{last_8_chars}"
 
-### `pubkeys` (bytes[])
-- **Display**: "Validator Public Key"
-- **Format**: "0x{first 8 chars}...{last 8 chars}"
-- **Count**: Show total number of validators
+### Withdrawal Credentials
+```json
+"withdrawal_credentials": {
+  "type": "raw",
+  "params": {
+    "encoding": "bytes32"
+  }
+}
+```
+- **First byte `0x00`**: BLS Withdrawal Key
+- **First byte `0x01`**: Execution Address (last 20 bytes)
 
-### `signatures` (bytes[])
-- **Display**: "Cryptographic Signature"
-- **Format**: "0x{first 8 chars}...{last 8 chars}"
-- **Note**: "Proves ownership of validator key"
+### Signature Data
+```json
+"signature": {
+  "type": "raw",
+  "params": {
+    "encoding": "bytes96"
+  }
+}
+```
+- Formats 96-byte BLS signatures
+- Purpose: Proves validator key ownership
 
-### `deposit_data_roots` (bytes32[])
-- **Display**: "Data Integrity Checksum"
-- **Format**: "0x{first 8 chars}...{last 8 chars}"
-- **Note**: "Verifies deposit data accuracy"
+### Data Roots
+```json
+"data_root": {
+  "type": "raw",
+  "params": {
+    "encoding": "bytes32"
+  }
+}
+```
+- Formats 32-byte Merkle roots
+- Purpose: Verifies deposit data integrity
 
 ## Value Display
 
@@ -111,27 +195,135 @@ Provide gas estimates based on validator count:
 - **Per validator**: ~21,000 gas
 - **Formula**: `73000 + (validator_count * 21000)`
 
-## Integration Steps
+## ERC-7730 Integration Steps
 
-1. **Detect Contract**: Identify FigmentEth2Depositor contract calls
-2. **Parse Parameters**: Extract and validate function parameters
-3. **Format Display**: Convert amounts, interpret credentials, show risks
-4. **Validate Data**: Check array lengths, amount limits, value matching
-5. **Show Summary**: Clear overview of validators being created
-6. **Confirm Risks**: Ensure user understands lockup and slashing
+### 1. Descriptor Loading
+```typescript
+// Load the ERC-7730 descriptor
+const descriptor = await fetch('/metadata/clear-signing-descriptor.json');
+const erc7730 = await descriptor.json();
 
-## Testing
+// Validate against schema
+const isValid = validateERC7730Schema(erc7730);
+```
 
-Test with these scenarios:
+### 2. Context Verification
+```typescript
+// Verify the contract matches the descriptor context
+const contractMatch = erc7730.context.contract.deployments.find(
+  deployment => deployment.chainId === currentChainId &&
+                deployment.address === transactionTo
+);
+```
+
+### 3. Intent Resolution
+```typescript
+// Resolve the intent template
+const intent = erc7730.display.intent.deposit;
+const resolvedIntent = intent
+  .replace('{{amounts_gwei.length}}', amounts_gwei.length)
+  .replace('{{msg.value}}', formatEth(msg.value));
+```
+
+### 4. Field Formatting
+```typescript
+// Apply field formatting rules
+const fields = erc7730.display.fields.deposit;
+const formattedFields = fields.map(field => ({
+  label: field.label,
+  value: formatFieldValue(field.path, field.format, transactionData)
+}));
+```
+
+### 5. Security Validation
+```typescript
+// Display warnings from descriptor
+const warnings = erc7730.security.warnings;
+const riskLevel = erc7730.security.risk_level; // "high"
+```
+
+### 6. Legacy Fallback
+```typescript
+// Fallback to human-readable ABI if ERC-7730 not supported
+if (!supportsERC7730) {
+  const legacyAbi = await fetch('/metadata/human-readable-abi.json');
+  // Use legacy_parameter_formatting section
+}
+```
+
+## Testing & Validation
+
+### ERC-7730 Validation
+```bash
+# Install the ERC-7730 validation tool
+pip install erc7730
+
+# Validate the descriptor
+erc7730 lint metadata/clear-signing-descriptor.json
+
+# Generate preview
+erc7730 preview metadata/clear-signing-descriptor.json
+```
+
+### Test Scenarios
+Test ERC-7730 integration with these scenarios:
 - Single validator (32 ETH)
 - Multiple validators with same amounts
 - Multiple validators with different amounts
-- Mixed withdrawal credential types
-- Edge cases (minimum/maximum amounts)
+- Mixed withdrawal credential types (0x00 vs 0x01)
+- Edge cases (minimum 32 ETH, maximum 2048 ETH)
 - Error conditions (mismatched arrays, insufficient amounts)
+- Large batches (approaching 500 validator limit)
 
-## Metadata Location
+### Descriptor Testing
+```typescript
+// Test intent resolution
+const testIntent = resolveIntent(
+  "Stake {{amounts_gwei.length}} validators with total {{msg.value}} ETH",
+  { amounts_gwei: [32000000000, 40000000000], msg: { value: "72000000000000000000" }}
+);
+// Expected: "Stake 2 validators with total 72 ETH on Ethereum 2.0"
 
-- JSON descriptors: `/metadata/clear-signing-descriptor.json`
-- Human-readable ABI: `/metadata/human-readable-abi.json`
-- This guide: `/metadata/wallet-integration-guide.md`
+// Test field formatting
+const testAmount = formatField("amounts_gwei.*", "gwei_to_eth", [32000000000]);
+// Expected: ["32 ETH"]
+```
+
+## File Structure & Registry Submission
+
+### Metadata Files
+- **ERC-7730 Descriptor**: `/metadata/clear-signing-descriptor.json`
+- **Human-readable ABI**: `/metadata/human-readable-abi.json`
+- **Integration Guide**: `/metadata/wallet-integration-guide.md`
+
+### Registry Submission
+To submit to the [ERC-7730 registry](https://github.com/LedgerHQ/clear-signing-erc7730-registry):
+
+1. **Fork the registry repository**
+2. **Add your descriptor** to the appropriate directory structure
+3. **Update deployment addresses** in the descriptor
+4. **Submit a pull request** with validation passing
+5. **Follow community review process**
+
+### ABI URL Configuration
+Update the ABI URL in the descriptor once published:
+```json
+"abi": {
+  "url": "https://raw.githubusercontent.com/figment-networks/figment-eth2-depositor/main/artifacts/contracts/FigmentEth2Depositor.sol/FigmentEth2Depositor.json"
+}
+```
+
+### Version Management
+- Update `metadata.version` when making changes
+- Maintain backward compatibility when possible
+- Document breaking changes in release notes
+
+## Migration from Legacy Format
+
+Wallets should implement graceful fallback:
+1. **Try ERC-7730 descriptor first** for enhanced display
+2. **Fall back to human-readable ABI** for basic formatting
+3. **Use raw ABI** as final fallback
+4. **Cache descriptors** to improve performance
+
+Legacy format fields are preserved in `legacy_parameter_formatting` for compatibility during transition period.

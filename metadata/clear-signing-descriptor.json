@@ -1,142 +1,153 @@
 {
-  "contract": {
+  "$schema": "https://raw.githubusercontent.com/LedgerHQ/clear-signing-erc7730-registry/master/schemas/erc7730.schema.json",
+  "metadata": {
     "name": "FigmentEth2Depositor",
     "description": "Batch Ethereum 2.0 validator deposit contract with variable amounts",
     "version": "1.0.0",
-    "address": "TBD",
-    "abi_hash": "TBD"
+    "owner": "Figment",
+    "tags": ["ethereum", "staking", "validators", "eth2", "batch"],
+    "maintainer": "Figment",
+    "legal": {
+      "license": "MIT",
+      "liability_disclaimer": "This descriptor is provided as-is. Users are responsible for verifying transaction details."
+    }
   },
-  "functions": {
-    "deposit": {
-      "description": "Create multiple Ethereum 2.0 validator deposits with custom amounts",
-      "risk_level": "high",
-      "warnings": [
-        "This will stake ETH on Ethereum 2.0 which cannot be withdrawn until withdrawals are enabled",
-        "Validator deposits are subject to slashing conditions",
-        "Minimum 32 ETH per validator required"
-      ],
-      "parameters": {
-        "pubkeys": {
-          "type": "bytes[]",
-          "description": "BLS public keys for each validator (48 bytes each)",
-          "display": "List of validator public keys",
-          "validation": {
-            "length": 48,
-            "format": "hex"
-          }
+  "context": {
+    "eip712": null,
+    "contract": {
+      "abi": {
+        "url": "https://raw.githubusercontent.com/figment-networks/figment-eth2-depositor/main/artifacts/contracts/FigmentEth2Depositor.sol/FigmentEth2Depositor.json"
+      },
+      "deployments": [
+        {
+          "chainId": 1,
+          "address": "TBD"
         },
-        "withdrawal_credentials": {
-          "type": "bytes[]",
-          "description": "Withdrawal credentials for each validator (32 bytes each)",
-          "display": "Withdrawal addresses for validator rewards",
-          "validation": {
-            "length": 32,
-            "format": "hex"
-          },
-          "interpretation": {
-            "0x00": "BLS withdrawal key",
-            "0x01": "Ethereum execution address"
-          }
+        {
+          "chainId": 11155111,
+          "address": "TBD"
+        }
+      ]
+    }
+  },
+  "display": {
+    "intent": {
+      "deposit": "Stake {{amounts_gwei.length}} validators with total {{msg.value}} ETH on Ethereum 2.0",
+      "pause": "Pause the FigmentEth2Depositor contract",
+      "unpause": "Unpause the FigmentEth2Depositor contract"
+    },
+    "formats": {
+      "gwei_to_eth": {
+        "type": "amount",
+        "currency": {
+          "type": "native"
         },
-        "signatures": {
-          "type": "bytes[]",
-          "description": "BLS signatures proving key ownership (96 bytes each)",
-          "display": "Cryptographic signatures",
-          "validation": {
-            "length": 96,
-            "format": "hex"
-          }
-        },
-        "deposit_data_roots": {
-          "type": "bytes32[]",
-          "description": "Merkle roots of deposit data for verification",
-          "display": "Deposit data checksums",
-          "validation": {
-            "length": 32,
-            "format": "hex"
-          }
-        },
-        "amounts_gwei": {
-          "type": "uint256[]",
-          "description": "Deposit amounts in gwei for each validator",
-          "display": "Staking amounts",
-          "formatting": {
-            "unit": "gwei",
-            "convert_to": "ETH",
-            "decimals": 9,
-            "display_format": "{value} ETH"
-          },
-          "validation": {
-            "min": "32000000000",
-            "max": "2048000000000"
-          }
+        "multiplier": "1000000000"
+      },
+      "validator_count": {
+        "type": "raw",
+        "params": {
+          "encoding": "uint256"
         }
       },
-      "value": {
-        "description": "Total ETH amount to stake across all validators",
-        "calculation": "sum(amounts_gwei) * 1e9",
-        "display": "Total staking amount in ETH"
+      "eth_address": {
+        "type": "address"
       },
-      "effects": {
-        "state_changes": [
-          "Creates {count} new Ethereum 2.0 validators",
-          "Stakes {total_amount} ETH total",
-          "Assigns withdrawal credentials to specified addresses"
-        ],
-        "events": [
-          {
-            "name": "DepositEvent",
-            "description": "Emitted for each successful validator deposit",
-            "parameters": {
-              "pubkey": "Validator public key",
-              "withdrawal_credentials": "Withdrawal address",
-              "amount": "Deposit amount in gwei",
-              "signature": "BLS signature",
-              "index": "Validator index"
-            }
-          }
-        ]
+      "validator_pubkey": {
+        "type": "raw",
+        "params": {
+          "encoding": "bytes48"
+        }
+      },
+      "withdrawal_credentials": {
+        "type": "raw",
+        "params": {
+          "encoding": "bytes32"
+        }
+      },
+      "signature": {
+        "type": "raw",
+        "params": {
+          "encoding": "bytes96"
+        }
+      },
+      "data_root": {
+        "type": "raw",
+        "params": {
+          "encoding": "bytes32"
+        }
       }
     },
-    "pause": {
-      "description": "Pause the contract (owner only)",
-      "risk_level": "medium",
-      "access_control": "onlyOwner",
-      "effects": {
-        "state_changes": ["Contract becomes paused", "No new deposits can be made"]
-      }
-    },
-    "unpause": {
-      "description": "Unpause the contract (owner only)",
-      "risk_level": "medium",
-      "access_control": "onlyOwner",
-      "effects": {
-        "state_changes": ["Contract becomes unpaused", "Deposits can be made again"]
-      }
+    "fields": {
+      "deposit": [
+        {
+          "path": "amounts_gwei.length",
+          "label": "Validators",
+          "format": "validator_count"
+        },
+        {
+          "path": "msg.value",
+          "label": "Total Stake",
+          "format": "gwei_to_eth"
+        },
+        {
+          "path": "amounts_gwei.*",
+          "label": "Individual Stakes",
+          "format": "gwei_to_eth"
+        },
+        {
+          "path": "pubkeys.*",
+          "label": "Validator Keys",
+          "format": "validator_pubkey"
+        },
+        {
+          "path": "withdrawal_credentials.*",
+          "label": "Withdrawal Addresses",
+          "format": "withdrawal_credentials"
+        },
+        {
+          "path": "signatures.*",
+          "label": "Signatures",
+          "format": "signature"
+        },
+        {
+          "path": "deposit_data_roots.*",
+          "label": "Data Roots",
+          "format": "data_root"
+        }
+      ],
+      "pause": [
+        {
+          "path": "msg.sender",
+          "label": "Caller",
+          "format": "eth_address"
+        }
+      ],
+      "unpause": [
+        {
+          "path": "msg.sender",
+          "label": "Caller",
+          "format": "eth_address"
+        }
+      ]
     }
   },
   "constants": {
-    "NODES_MAX_AMOUNT": {
-      "value": 500,
-      "description": "Maximum number of validators per transaction"
-    },
-    "MIN_COLLATERAL_GWEI": {
-      "value": "32000000000",
-      "description": "Minimum deposit amount (32 ETH in gwei)"
-    },
-    "MAX_COLLATERAL_GWEI": {
-      "value": "2048000000000",
-      "description": "Maximum deposit amount (2048 ETH in gwei)"
-    }
+    "NODES_MAX_AMOUNT": 500,
+    "MIN_COLLATERAL_GWEI": "32000000000",
+    "MAX_COLLATERAL_GWEI": "2048000000000"
   },
   "security": {
+    "risk_level": "high",
+    "warnings": [
+      "Validators are subject to slashing conditions",
+      "Minimum 32 ETH required per validator",
+      "Invalid validator data may result in permanent loss"
+    ],
     "audits": [],
     "known_risks": [
-      "Ethereum 2.0 staking lockup period",
       "Potential slashing conditions",
-      "Smart contract risk",
-      "Validator key management responsibility"
-    ],
-    "emergency_functions": ["pause", "unpause"]
+      "Smart contract risk"
+    ]
   }
 }
