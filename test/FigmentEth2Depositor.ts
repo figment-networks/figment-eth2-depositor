@@ -26,7 +26,7 @@ describe("FigmentEth2Depositor", async function () {
       args: [],
     });
 
-    assert.equal(contractDepositContract.toLowerCase(), mockDepositContract.toLowerCase());
+    assert.equal((contractDepositContract as string).toLowerCase(), mockDepositContract.toLowerCase());
   });
 
   it("Should be initially unpaused", async function () {
