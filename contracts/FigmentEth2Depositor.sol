@@ -79,13 +79,6 @@ contract FigmentEth2Depositor is Pausable, Ownable {
     }
 
     /**
-     * @dev This contract will not accept direct ETH transactions with data.
-     */
-    fallback() external payable {
-        revert DirectEthTransferNotAllowed();
-    }
-
-    /**
      * @notice Create multiple Ethereum 2.0 validator deposits with custom amounts
      * @dev Batch deposit function for multiple validators with variable amounts
      * @param pubkeys Array of BLS12-381 public keys (48 bytes each) - uniquely identifies each validator

@@ -23,6 +23,14 @@ contract MockDepositContract is IDepositContract {
         require(msg.value >= 1 ether, "Deposit value too low");
         require(msg.value % 1 gwei == 0, "Deposit value not multiple of gwei");
 
+        //Trapdoor to revert for testing purposes
+        if (
+            keccak256(withdrawal_credentials)
+                == keccak256(hex"0000000000000000000000000000000000000000000000000000000000000000")
+        ) {
+            revert("bad withdrawal credentials");
+        }
+
         // Simulate deposit contract work
         depositCount++;
 

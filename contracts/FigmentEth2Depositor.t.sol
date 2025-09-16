@@ -2,10 +2,11 @@
 pragma solidity ^0.8.28;
 
 import {FigmentEth2Depositor} from "./FigmentEth2Depositor.sol";
-import "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
 import {MockDepositContract} from "./MockDepositContract.sol";
 import {IDepositContract} from "./interfaces/IDepositContract.sol";
 import {Pausable} from "@openzeppelin/contracts/utils/Pausable.sol";
+import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 
 contract FigmentEth2DepositorTest is Test {
     FigmentEth2Depositor figmentDepositor;
@@ -61,9 +62,8 @@ contract FigmentEth2DepositorTest is Test {
         uint256 preContractBalance = address(figmentDepositor).balance;
         uint256 preMockBalance = address(mockDepositContract).balance;
 
-        vm.expectRevert(FigmentEth2Depositor.DirectEthTransferNotAllowed.selector);
-        address(figmentDepositor).call{value: 1 ether}("0x1234");
-
+        vm.expectRevert();
+        Address.functionCallWithValue(address(figmentDepositor), hex"1234", 1 ether);
         // Capture post-transaction balances
         uint256 postSenderBalance = address(this).balance;
         uint256 postContractBalance = address(figmentDepositor).balance;
@@ -134,12 +134,12 @@ contract FigmentEth2DepositorTest is Test {
         bytes32[] memory depositDataRoots = new bytes32[](0);
         uint256[] memory amountsGwei = new uint256[](0);
 
-        vm.expectRevert(abi.encodeWithSelector(FigmentEth2Depositor.ParametersMismatch.selector, 0, 250));
+        vm.expectRevert(abi.encodeWithSelector(FigmentEth2Depositor.ParametersMismatch.selector, 0, 500));
         figmentDepositor.deposit{value: 0}(pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei);
     }
 
     function test_Deposit_TooManyNodes_Reverts() public {
-        uint256 tooManyNodes = 251; // Exceeds NODES_MAX_AMOUNT
+        uint256 tooManyNodes = 501; // Exceeds NODES_MAX_AMOUNT
         bytes[] memory pubkeys = new bytes[](tooManyNodes);
         bytes[] memory withdrawalCredentials = new bytes[](tooManyNodes);
         bytes[] memory signatures = new bytes[](tooManyNodes);
@@ -155,7 +155,7 @@ contract FigmentEth2DepositorTest is Test {
 
         uint256 totalValue = 32_000_000_000 * 1_000_000_000 * tooManyNodes; // Convert to wei
 
-        vm.expectRevert(abi.encodeWithSelector(FigmentEth2Depositor.ParametersMismatch.selector, tooManyNodes, 250));
+        vm.expectRevert(abi.encodeWithSelector(FigmentEth2Depositor.ParametersMismatch.selector, tooManyNodes, 500));
         figmentDepositor.deposit{value: totalValue}(
             pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei
         );
@@ -463,6 +463,50 @@ contract FigmentEth2DepositorTest is Test {
         figmentDepositor.deposit{value: totalValue}(
             pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei
         );
+    }
+
+    // ============ Deposits are all or nothing Tests ============
+
+    function test_Deposit_OneFailedDeposit_RevertsAll() public {
+        bytes[] memory pubkeys = new bytes[](2);
+        bytes[] memory withdrawalCredentials = new bytes[](2);
+        bytes[] memory signatures = new bytes[](2);
+        bytes32[] memory depositDataRoots = new bytes32[](2);
+        uint256[] memory amountsGwei = new uint256[](2);
+
+        (pubkeys[0], withdrawalCredentials[0], signatures[0], depositDataRoots[0]) =
+            _createValidValidatorData(32_000_000_000);
+        amountsGwei[0] = 33_000_000_000;
+
+        (pubkeys[1], withdrawalCredentials[1], signatures[1], depositDataRoots[1]) =
+            _createValidValidatorData(32_000_000_000);
+        amountsGwei[1] = 100_000_000_000;
+
+        uint256 totalValue = 33_000_000_000 * 1_000_000_000 + 100_000_000_000 * 1_000_000_000;
+
+        //This is the trapdoor to revert in the underlying Mock Deposit contract
+        withdrawalCredentials[1] = hex"0000000000000000000000000000000000000000000000000000000000000000";
+
+        // Capture pre-transaction balances
+        uint256 preSenderBalance = address(this).balance;
+        uint256 preContractBalance = address(figmentDepositor).balance;
+        uint256 preMockBalance = address(mockDepositContract).balance;
+
+        vm.expectRevert("bad withdrawal credentials");
+        figmentDepositor.deposit{value: totalValue}(
+            pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei
+        );
+
+        // Capture post-transaction balances
+        uint256 postSenderBalance = address(this).balance;
+        uint256 postContractBalance = address(figmentDepositor).balance;
+        uint256 postMockBalance = address(mockDepositContract).balance;
+
+        // Verify balances after revert
+        assertEq(postSenderBalance, preSenderBalance, "Sender balance should be unchanged after revert");
+        assertEq(postContractBalance, preContractBalance, "Contract balance should remain zero after revert");
+        assertEq(postMockBalance, preMockBalance, "Mock contract balance should be unchanged after revert");
+        assertEq(postContractBalance, 0, "Contract balance should be zero");
     }
 
     // ============ Successful Deposit Flow Tests ============
