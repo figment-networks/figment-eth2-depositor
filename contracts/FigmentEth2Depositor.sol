@@ -6,6 +6,14 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
 import "../contracts/interfaces/IDepositContract.sol";
 
+/**
+ * @title FigmentEth2Depositor
+ * @notice Batch Ethereum 2.0 validator deposit contract with variable amounts
+ * @dev Allows creating multiple validators in a single transaction with custom stake amounts
+ * @dev Supports deposits between 32 ETH and 2048 ETH per validator
+ * @dev Maximum 500 validators per transaction for gas efficiency
+ * @author Figment
+ */
 contract FigmentEth2Depositor is Pausable, Ownable {
 
     /**
@@ -72,13 +80,16 @@ contract FigmentEth2Depositor is Pausable, Ownable {
     }
 
     /**
-     * @dev Function that allows to deposit many nodes at once.
-     *
-     * - pubkeys                - Array of BLS12-381 public keys.
-     * - withdrawal_credentials - Array of commitments to a public keys for withdrawals.
-     * - signatures             - Array of BLS12-381 signatures.
-     * - deposit_data_roots     - Array of the SHA-256 hashes of the SSZ-encoded DepositData objects.
-     * - amounts_gwei            - Array of deposit amounts in gwei for each validator.
+     * @notice Create multiple Ethereum 2.0 validator deposits with custom amounts
+     * @dev Batch deposit function for multiple validators with variable amounts
+     * @param pubkeys Array of BLS12-381 public keys (48 bytes each) - uniquely identifies each validator
+     * @param withdrawal_credentials Array of withdrawal credentials (32 bytes each) - where rewards will be sent
+     * @param signatures Array of BLS12-381 signatures (96 bytes each) - proves ownership of validator keys
+     * @param deposit_data_roots Array of SSZ deposit data roots (32 bytes each) - integrity checksums
+     * @param amounts_gwei Array of deposit amounts in gwei - must be between 32 ETH and 2048 ETH per validator
+     * @dev msg.value must equal the sum of all amounts_gwei converted to wei
+     * @dev Each validator will be created on Ethereum 2.0 with the specified amount
+     * @dev Funds will be locked until Ethereum 2.0 withdrawals are enabled
      */
     function deposit(
         bytes[] calldata pubkeys,
@@ -181,5 +192,11 @@ contract FigmentEth2Depositor is Pausable, Ownable {
       _unpause();
     }
 
+    /**
+     * @notice Emitted when a batch deposit is successfully completed
+     * @param from Address that initiated the deposit transaction
+     * @param nodesAmount Number of validators created in this transaction
+     * @param totalAmount Total ETH amount staked across all validators (in wei)
+     */
     event DepositEvent(address from, uint256 nodesAmount, uint256 totalAmount);
 }

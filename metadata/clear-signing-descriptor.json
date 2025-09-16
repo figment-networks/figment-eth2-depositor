@@ -1,0 +1,153 @@
+{
+  "$schema": "https://raw.githubusercontent.com/LedgerHQ/clear-signing-erc7730-registry/master/schemas/erc7730.schema.json",
+  "metadata": {
+    "name": "FigmentEth2Depositor",
+    "description": "Batch Ethereum 2.0 validator deposit contract with variable amounts",
+    "version": "1.0.0",
+    "owner": "Figment",
+    "tags": ["ethereum", "staking", "validators", "eth2", "batch"],
+    "maintainer": "Figment",
+    "legal": {
+      "license": "MIT",
+      "liability_disclaimer": "This descriptor is provided as-is. Users are responsible for verifying transaction details."
+    }
+  },
+  "context": {
+    "eip712": null,
+    "contract": {
+      "abi": {
+        "url": "https://raw.githubusercontent.com/figment-networks/figment-eth2-depositor/main/artifacts/contracts/FigmentEth2Depositor.sol/FigmentEth2Depositor.json"
+      },
+      "deployments": [
+        {
+          "chainId": 1,
+          "address": "TBD"
+        },
+        {
+          "chainId": 11155111,
+          "address": "TBD"
+        }
+      ]
+    }
+  },
+  "display": {
+    "intent": {
+      "deposit": "Stake {{amounts_gwei.length}} validators with total {{msg.value}} ETH on Ethereum 2.0",
+      "pause": "Pause the FigmentEth2Depositor contract",
+      "unpause": "Unpause the FigmentEth2Depositor contract"
+    },
+    "formats": {
+      "gwei_to_eth": {
+        "type": "amount",
+        "currency": {
+          "type": "native"
+        },
+        "multiplier": "1000000000"
+      },
+      "validator_count": {
+        "type": "raw",
+        "params": {
+          "encoding": "uint256"
+        }
+      },
+      "eth_address": {
+        "type": "address"
+      },
+      "validator_pubkey": {
+        "type": "raw",
+        "params": {
+          "encoding": "bytes48"
+        }
+      },
+      "withdrawal_credentials": {
+        "type": "raw",
+        "params": {
+          "encoding": "bytes32"
+        }
+      },
+      "signature": {
+        "type": "raw",
+        "params": {
+          "encoding": "bytes96"
+        }
+      },
+      "data_root": {
+        "type": "raw",
+        "params": {
+          "encoding": "bytes32"
+        }
+      }
+    },
+    "fields": {
+      "deposit": [
+        {
+          "path": "amounts_gwei.length",
+          "label": "Validators",
+          "format": "validator_count"
+        },
+        {
+          "path": "msg.value",
+          "label": "Total Stake",
+          "format": "gwei_to_eth"
+        },
+        {
+          "path": "amounts_gwei.*",
+          "label": "Individual Stakes",
+          "format": "gwei_to_eth"
+        },
+        {
+          "path": "pubkeys.*",
+          "label": "Validator Keys",
+          "format": "validator_pubkey"
+        },
+        {
+          "path": "withdrawal_credentials.*",
+          "label": "Withdrawal Addresses",
+          "format": "withdrawal_credentials"
+        },
+        {
+          "path": "signatures.*",
+          "label": "Signatures",
+          "format": "signature"
+        },
+        {
+          "path": "deposit_data_roots.*",
+          "label": "Data Roots",
+          "format": "data_root"
+        }
+      ],
+      "pause": [
+        {
+          "path": "msg.sender",
+          "label": "Caller",
+          "format": "eth_address"
+        }
+      ],
+      "unpause": [
+        {
+          "path": "msg.sender",
+          "label": "Caller",
+          "format": "eth_address"
+        }
+      ]
+    }
+  },
+  "constants": {
+    "NODES_MAX_AMOUNT": 500,
+    "MIN_COLLATERAL_GWEI": "32000000000",
+    "MAX_COLLATERAL_GWEI": "2048000000000"
+  },
+  "security": {
+    "risk_level": "high",
+    "warnings": [
+      "Validators are subject to slashing conditions",
+      "Minimum 32 ETH required per validator",
+      "Invalid validator data may result in permanent loss"
+    ],
+    "audits": [],
+    "known_risks": [
+      "Potential slashing conditions",
+      "Smart contract risk"
+    ]
+  }
+}
