@@ -105,10 +105,10 @@ contract FigmentEth2Depositor is Pausable, Ownable {
         }
 
         // Gas optimization: Combined length validation to reduce multiple checks
-        if (
-            withdrawal_credentials.length != nodesAmount || signatures.length != nodesAmount
-                || deposit_data_roots.length != nodesAmount || amounts_gwei.length != nodesAmount
-        ) {
+        if (withdrawal_credentials.length != nodesAmount ||
+            signatures.length != nodesAmount ||
+            deposit_data_roots.length != nodesAmount ||
+            amounts_gwei.length != nodesAmount) { 
             revert ParametersMismatch(nodesAmount, 0); // Use 0 as generic mismatch indicator
         }
 
@@ -156,8 +156,11 @@ contract FigmentEth2Depositor is Pausable, Ownable {
                 uint256 amountWei = amounts_gwei[i] * GWEI_TO_WEI;
 
                 cachedDepositContract.deposit{value: amountWei}(
-                    pubkeys[i], withdrawal_credentials[i], signatures[i], deposit_data_roots[i]
-                );
+                  pubkeys[i],
+                  withdrawal_credentials[i],
+                  signatures[i],
+                  deposit_data_roots[i]
+              );
             }
         }
 
@@ -172,7 +175,7 @@ contract FigmentEth2Depositor is Pausable, Ownable {
      * - The contract must not be paused.
      */
     function pause() external onlyOwner {
-        _pause();
+      _pause();
     }
 
     /**
@@ -183,7 +186,7 @@ contract FigmentEth2Depositor is Pausable, Ownable {
      * - The contract must be paused.
      */
     function unpause() external onlyOwner {
-        _unpause();
+      _unpause();
     }
 
     /**
