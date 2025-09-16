@@ -4,7 +4,7 @@ import { describe, it } from "node:test";
 import { network } from "hardhat";
 import { parseGwei } from "viem";
 
-describe("FigmentEth2Depositor", async function () {
+describe("FigmentEth2DepositorPectra", async function () {
   const { viem } = await network.connect();
   const publicClient = await viem.getPublicClient();
 
@@ -12,7 +12,7 @@ describe("FigmentEth2Depositor", async function () {
     // Mock deposit contract address (for testing)
     const mockDepositContract = "0x00000000219ab540356cBB839Cbe05303d7705Fa"; // Ethereum 2.0 deposit contract
 
-    const depositor = await viem.deployContract("FigmentEth2Depositor", [mockDepositContract]);
+    const depositor = await viem.deployContract("FigmentEth2DepositorPectra", [mockDepositContract]);
 
     // Check that the contract was deployed
     assert.ok(depositor.address);
@@ -30,7 +30,7 @@ describe("FigmentEth2Depositor", async function () {
 
   it("Should be initially unpaused", async function () {
     const mockDepositContract = "0x00000000219ab540356cBB839Cbe05303d7705Fa";
-    const depositor = await viem.deployContract("FigmentEth2Depositor", [mockDepositContract]);
+    const depositor = await viem.deployContract("FigmentEth2DepositorPectra", [mockDepositContract]);
 
     const paused = await publicClient.readContract({
       address: depositor.address,
@@ -44,7 +44,7 @@ describe("FigmentEth2Depositor", async function () {
 
   it("Should validate deposit parameters for variable amounts", async function () {
     const mockDepositContract = "0x00000000219ab540356cBB839Cbe05303d7705Fa";
-    const depositor = await viem.deployContract("FigmentEth2Depositor", [mockDepositContract]);
+    const depositor = await viem.deployContract("FigmentEth2DepositorPectra", [mockDepositContract]);
 
     // Test data for multiple validators with different amounts
     const pubkeys = [

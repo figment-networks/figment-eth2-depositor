@@ -125,7 +125,7 @@ async function demoEventMonitoring() {
 
   // Deploy Figment contract
   console.log("📦 Deploying Figment contract...");
-  const figmentContract = await viem.deployContract("FigmentEth2Depositor", [mockDepositContract.address]);
+  const figmentContract = await viem.deployContract("FigmentEth2DepositorPectra", [mockDepositContract.address]);
   console.log(`✅ Figment Contract: ${figmentContract.address}`);
   console.log("");
 

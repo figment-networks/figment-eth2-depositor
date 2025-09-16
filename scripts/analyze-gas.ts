@@ -1,7 +1,7 @@
 import { network } from "hardhat";
 import { parseEther, parseGwei } from "viem";
 import { GasReporter } from "../test/utils/gasReporter.js";
-import { generateValidatorData, measureGas, generateVariableAmounts, generateVariableAmountsGwei, calculateTotalValue, calculateTotalValueFromGwei, gweiToEthStrings } from "../test/utils/testHelpers.js";
+import { generateValidatorData, measureGas, generateVariableAmountsGwei, calculateTotalValueFromGwei, gweiToEthStrings } from "../test/utils/testHelpers.js";
 
 async function main() {
   const { viem } = await network.connect();
@@ -20,7 +20,7 @@ async function main() {
 
   // Deploy contracts
   console.log("Deploying test contracts...");
-  const newContract = await viem.deployContract("FigmentEth2Depositor", [mockDepositContract]);
+  const newContract = await viem.deployContract("FigmentEth2DepositorPectra", [mockDepositContract]);
   const legacyContract = await viem.deployContract("FigmentEth2Depositor0x01", [mockDepositContract]);
 
   console.log(`✅ New Contract deployed at: ${newContract.address}`);

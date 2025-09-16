@@ -4,7 +4,7 @@ import { describe, it } from "node:test";
 import { network } from "hardhat";
 import { parseEther } from "viem";
 import { GasReporter } from "./utils/gasReporter.js";
-import { generateValidatorData, measureGas, generateVariableAmounts, generateVariableAmountsGwei, calculateTotalValue, calculateTotalValueFromGwei, gweiToEthStrings } from "./utils/testHelpers.js";
+import { generateValidatorData, measureGas, generateVariableAmountsGwei, calculateTotalValueFromGwei, gweiToEthStrings } from "./utils/testHelpers.js";
 
 describe("Gas Cost Comparison: New vs Legacy", async function () {
   const { viem } = await network.connect();
@@ -30,7 +30,7 @@ describe("Gas Cost Comparison: New vs Legacy", async function () {
     console.log(`✅ Mock Deposit Contract deployed at: ${mockDepositContract}\n`);
 
     // Deploy both contracts
-    const newContract = await viem.deployContract("FigmentEth2Depositor", [mockDepositContract]);
+    const newContract = await viem.deployContract("FigmentEth2DepositorPectra", [mockDepositContract]);
     const legacyContract = await viem.deployContract("FigmentEth2Depositor0x01", [mockDepositContract]);
 
     console.log("Contracts deployed:");
@@ -134,7 +134,7 @@ describe("Gas Cost Comparison: New vs Legacy", async function () {
     const testMockContract = await deployMockDepositContract();
 
     // Get deployment gas estimates
-    const newDeployment = await viem.deployContract("FigmentEth2Depositor", [testMockContract]);
+    const newDeployment = await viem.deployContract("FigmentEth2DepositorPectra", [testMockContract]);
     const legacyDeployment = await viem.deployContract("FigmentEth2Depositor0x01", [testMockContract]);
 
     // Get contract bytecode sizes

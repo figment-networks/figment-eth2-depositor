@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
 import "../contracts/interfaces/IDepositContract.sol";
 
-contract FigmentEth2Depositor is Pausable, Ownable {
+contract FigmentEth2DepositorPectra is Pausable, Ownable {
 
     /**
      * @dev Custom errors for better gas efficiency and debugging

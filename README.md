@@ -30,7 +30,7 @@ This project includes an example Ignition module to deploy the contract. You can
 To run the deployment to a local chain:
 
 ```shell
-pnpm hardhat ignition deploy ignition/modules/FigmentEth2Depositor.ts
+pnpm hardhat ignition deploy ignition/modules/FigmentEth2DepositorPectra.ts
 ```
 
 To run the deployment to Sepolia, you need an account with funds to send the transaction. The provided Hardhat configuration includes a Configuration Variable called `SEPOLIA_PRIVATE_KEY`, which you can use to set the private key of the account you want to use.
