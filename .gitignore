@@ -21,3 +21,10 @@
 
 # VS Code settings
 .vscode/
+
+# Temporary files for dev
+/tmp
+
+# Remix dirs
+/.deps
+/.states
