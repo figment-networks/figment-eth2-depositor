@@ -538,7 +538,7 @@ contract FigmentEth2DepositorV1Test is Test {
 
         // Expect the FigmentEth2DepositorV1 event SECOND (it's emitted after the deposit)
         vm.expectEmit(true, true, true, true);
-        emit FigmentEth2DepositorV1.DepositEvent(address(this), 1, totalValue);
+        emit FigmentEth2DepositorV1.BatchDepositEvent(address(this), 1, totalValue);
 
         figmentDepositor.deposit{value: totalValue}(
             pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei
@@ -568,7 +568,7 @@ contract FigmentEth2DepositorV1Test is Test {
 
         // Execute successful deposit
         vm.expectEmit(true, true, true, true);
-        emit FigmentEth2DepositorV1.DepositEvent(address(this), 1, totalValue);
+        emit FigmentEth2DepositorV1.BatchDepositEvent(address(this), 1, totalValue);
 
         figmentDepositor.deposit{value: totalValue}(
             pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei
@@ -635,7 +635,7 @@ contract FigmentEth2DepositorV1Test is Test {
         );
 
         vm.expectEmit(true, true, true, true);
-        emit FigmentEth2DepositorV1.DepositEvent(address(this), validatorCount, totalValue);
+        emit FigmentEth2DepositorV1.BatchDepositEvent(address(this), validatorCount, totalValue);
 
         figmentDepositor.deposit{value: totalValue}(
             pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei
@@ -664,7 +664,7 @@ contract FigmentEth2DepositorV1Test is Test {
 
         // Expect DepositEvent to be emitted
         vm.expectEmit(true, true, true, true);
-        emit FigmentEth2DepositorV1.DepositEvent(address(this), validatorCount, totalValue);
+        emit FigmentEth2DepositorV1.BatchDepositEvent(address(this), validatorCount, totalValue);
 
         figmentDepositor.deposit{value: totalValue}(
             pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei
@@ -697,7 +697,7 @@ contract FigmentEth2DepositorV1Test is Test {
 
         // Expect DepositEvent to be emitted
         vm.expectEmit(true, true, true, true);
-        emit FigmentEth2DepositorV1.DepositEvent(address(this), 2, totalValue);
+        emit FigmentEth2DepositorV1.BatchDepositEvent(address(this), 2, totalValue);
 
         figmentDepositor.deposit{value: totalValue}(
             pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei
@@ -766,7 +766,7 @@ contract FigmentEth2DepositorV1Test is Test {
         );
 
         vm.expectEmit(true, true, true, true);
-        emit FigmentEth2DepositorV1.DepositEvent(address(this), 4, totalValue);
+        emit FigmentEth2DepositorV1.BatchDepositEvent(address(this), 4, totalValue);
 
         figmentDepositor.deposit{value: totalValue}(
             pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei
@@ -902,7 +902,7 @@ contract FigmentEth2DepositorV1Test is Test {
         uint256 totalValue = amountGwei * 1_000_000_000;
 
         vm.expectEmit(true, true, true, true);
-        emit FigmentEth2DepositorV1.DepositEvent(address(this), 1, totalValue);
+        emit FigmentEth2DepositorV1.BatchDepositEvent(address(this), 1, totalValue);
 
         figmentDepositor.deposit{value: totalValue}(
             pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei

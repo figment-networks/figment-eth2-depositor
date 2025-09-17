@@ -4,7 +4,7 @@ import { generateValidatorData } from "../test/utils/testHelpers.js";
 
 // Event signatures
 const DEPOSIT_EVENT_ABI = parseAbiItem("event DepositEvent(bytes pubkey, bytes withdrawal_credentials, bytes amount, bytes signature, bytes index)");
-const FIGMENT_DEPOSIT_EVENT_ABI = parseAbiItem("event DepositEvent(address from, uint256 nodesAmount, uint256 totalAmount)");
+const FIGMENT_DEPOSIT_EVENT_ABI = parseAbiItem("event BatchDepositEvent(address from, uint256 nodesAmount, uint256 totalAmount)");
 
 async function analyzeTransactionReceipt(receipt: any) {
   console.log("🔍 Analyzing Transaction Events");

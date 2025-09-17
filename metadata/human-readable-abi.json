@@ -13,7 +13,7 @@
     "function paused() view returns (bool)",
     "function owner() view returns (address)",
     "function depositContract() view returns (address)",
-    "event DepositEvent(address indexed from, uint256 nodesAmount, uint256 totalAmount)"
+    "event BatchDepositEvent(address indexed from, uint256 nodesAmount, uint256 totalAmount)"
   ],
   "function_descriptions": {
     "deposit": {

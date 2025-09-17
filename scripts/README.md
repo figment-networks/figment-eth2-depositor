@@ -100,7 +100,7 @@ event DepositEvent(
 The Figment contract also emits its own event:
 
 ```solidity
-event DepositEvent(
+event BatchDepositEvent(
     address from,       // Address that made the deposit
     uint256 nodesAmount, // Number of validators
     uint256 totalAmount  // Total ETH amount in wei
