@@ -164,7 +164,7 @@ contract FigmentEth2DepositorV1 is Pausable, Ownable {
             }
         }
 
-        emit DepositEvent(msg.sender, nodesAmount, totalAmount);
+        emit BatchDepositEvent(msg.sender, nodesAmount, totalAmount);
     }
 
     /**
@@ -195,5 +195,5 @@ contract FigmentEth2DepositorV1 is Pausable, Ownable {
      * @param nodesAmount Number of validators created in this transaction
      * @param totalAmount Total ETH amount staked across all validators (in wei)
      */
-    event DepositEvent(address from, uint256 nodesAmount, uint256 totalAmount);
+    event BatchDepositEvent(address from, uint256 nodesAmount, uint256 totalAmount);
 }
