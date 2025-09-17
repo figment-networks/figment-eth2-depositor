@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
 import "../contracts/interfaces/IDepositContract.sol";
 
-contract FigmentEth2Depositor0x01 is Pausable, Ownable {
+contract FigmentEth2DepositorV0 is Pausable, Ownable {
 
     /**
      * @dev Eth2 Deposit Contract address.

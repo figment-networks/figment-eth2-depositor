@@ -1,4 +1,4 @@
-# FigmentEth2Depositor Optimizations
+# FigmentEth2DepositorV1 Optimizations
 
 ## Withdrawal Credentials Validation
 

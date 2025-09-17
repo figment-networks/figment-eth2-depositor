@@ -1,36 +1,36 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.28;
 
-import {FigmentEth2Depositor} from "./FigmentEth2Depositor.sol";
+import {FigmentEth2DepositorV1} from "./FigmentEth2DepositorV1.sol";
 import {Test} from "forge-std/src/Test.sol";
 import {MockDepositContract} from "./MockDepositContract.sol";
 import {IDepositContract} from "./interfaces/IDepositContract.sol";
 import {Pausable} from "@openzeppelin/contracts/utils/Pausable.sol";
 import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 
-contract FigmentEth2DepositorTest is Test {
-    FigmentEth2Depositor figmentDepositor;
+contract FigmentEth2DepositorV1Test is Test {
+    FigmentEth2DepositorV1 figmentDepositor;
     MockDepositContract mockDepositContract;
 
     function setUp() public {
         // Deploy mock deposit contract for testing
         mockDepositContract = new MockDepositContract();
-        figmentDepositor = new FigmentEth2Depositor(address(mockDepositContract));
+        figmentDepositor = new FigmentEth2DepositorV1(address(mockDepositContract));
     }
 
     // ============ Constructor Tests ============
 
     function test_Constructor_Success() public {
         address ethDepositContract = address(0x123);
-        FigmentEth2Depositor newFigmentEth2Depositor = new FigmentEth2Depositor(ethDepositContract);
+        FigmentEth2DepositorV1 newFigmentEth2DepositorV1 = new FigmentEth2DepositorV1(ethDepositContract);
 
-        assertEq(address(newFigmentEth2Depositor.depositContract()), ethDepositContract);
-        assertEq(newFigmentEth2Depositor.owner(), address(this));
+        assertEq(address(newFigmentEth2DepositorV1.depositContract()), ethDepositContract);
+        assertEq(newFigmentEth2DepositorV1.owner(), address(this));
     }
 
     function test_Constructor_ZeroAddress_Reverts() public {
-        vm.expectRevert(FigmentEth2Depositor.ZeroAddress.selector);
-        new FigmentEth2Depositor(address(0));
+        vm.expectRevert(FigmentEth2DepositorV1.ZeroAddress.selector);
+        new FigmentEth2DepositorV1(address(0));
     }
 
     // ============ Receive Function Tests ============
@@ -41,7 +41,7 @@ contract FigmentEth2DepositorTest is Test {
         uint256 preContractBalance = address(figmentDepositor).balance;
         uint256 preMockBalance = address(mockDepositContract).balance;
 
-        vm.expectRevert(FigmentEth2Depositor.DirectEthTransferNotAllowed.selector);
+        vm.expectRevert(FigmentEth2DepositorV1.DirectEthTransferNotAllowed.selector);
         address(figmentDepositor).call{value: 1 ether}("");
 
         // Capture post-transaction balances
@@ -134,7 +134,7 @@ contract FigmentEth2DepositorTest is Test {
         bytes32[] memory depositDataRoots = new bytes32[](0);
         uint256[] memory amountsGwei = new uint256[](0);
 
-        vm.expectRevert(abi.encodeWithSelector(FigmentEth2Depositor.ParametersMismatch.selector, 0, 500));
+        vm.expectRevert(abi.encodeWithSelector(FigmentEth2DepositorV1.ParametersMismatch.selector, 0, 500));
         figmentDepositor.deposit{value: 0}(pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei);
     }
 
@@ -155,7 +155,7 @@ contract FigmentEth2DepositorTest is Test {
 
         uint256 totalValue = 32_000_000_000 * 1_000_000_000 * tooManyNodes; // Convert to wei
 
-        vm.expectRevert(abi.encodeWithSelector(FigmentEth2Depositor.ParametersMismatch.selector, tooManyNodes, 500));
+        vm.expectRevert(abi.encodeWithSelector(FigmentEth2DepositorV1.ParametersMismatch.selector, tooManyNodes, 500));
         figmentDepositor.deposit{value: totalValue}(
             pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei
         );
@@ -172,7 +172,7 @@ contract FigmentEth2DepositorTest is Test {
             _createValidValidatorData(32_000_000_000);
         amountsGwei[0] = 32_000_000_000;
 
-        vm.expectRevert(abi.encodeWithSelector(FigmentEth2Depositor.ParametersMismatch.selector, 1, 0));
+        vm.expectRevert(abi.encodeWithSelector(FigmentEth2DepositorV1.ParametersMismatch.selector, 1, 0));
         figmentDepositor.deposit{value: 32 ether}(
             pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei
         );
@@ -189,7 +189,7 @@ contract FigmentEth2DepositorTest is Test {
             _createValidValidatorData(32_000_000_000);
         amountsGwei[0] = 32_000_000_000;
 
-        vm.expectRevert(abi.encodeWithSelector(FigmentEth2Depositor.ParametersMismatch.selector, 1, 0));
+        vm.expectRevert(abi.encodeWithSelector(FigmentEth2DepositorV1.ParametersMismatch.selector, 1, 0));
         figmentDepositor.deposit{value: 32 ether}(
             pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei
         );
@@ -206,7 +206,7 @@ contract FigmentEth2DepositorTest is Test {
             _createValidValidatorData(32_000_000_000);
         amountsGwei[0] = 32_000_000_000;
 
-        vm.expectRevert(abi.encodeWithSelector(FigmentEth2Depositor.ParametersMismatch.selector, 1, 0));
+        vm.expectRevert(abi.encodeWithSelector(FigmentEth2DepositorV1.ParametersMismatch.selector, 1, 0));
         figmentDepositor.deposit{value: 32 ether}(
             pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei
         );
@@ -223,7 +223,7 @@ contract FigmentEth2DepositorTest is Test {
             _createValidValidatorData(32_000_000_000);
         amountsGwei[0] = 32_000_000_000;
 
-        vm.expectRevert(abi.encodeWithSelector(FigmentEth2Depositor.ParametersMismatch.selector, 1, 0));
+        vm.expectRevert(abi.encodeWithSelector(FigmentEth2DepositorV1.ParametersMismatch.selector, 1, 0));
         figmentDepositor.deposit{value: 32 ether}(
             pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei
         );
@@ -244,7 +244,7 @@ contract FigmentEth2DepositorTest is Test {
         amountsGwei[0] = belowMinimum;
 
         vm.expectRevert(
-            abi.encodeWithSelector(FigmentEth2Depositor.InsufficientAmount.selector, belowMinimum, 32_000_000_000)
+            abi.encodeWithSelector(FigmentEth2DepositorV1.InsufficientAmount.selector, belowMinimum, 32_000_000_000)
         );
         figmentDepositor.deposit{value: belowMinimum * 1_000_000_000}(
             pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei
@@ -264,7 +264,7 @@ contract FigmentEth2DepositorTest is Test {
         amountsGwei[0] = aboveMaximum;
 
         vm.expectRevert(
-            abi.encodeWithSelector(FigmentEth2Depositor.InsufficientAmount.selector, aboveMaximum, 2_048_000_000_000)
+            abi.encodeWithSelector(FigmentEth2DepositorV1.InsufficientAmount.selector, aboveMaximum, 2_048_000_000_000)
         );
         figmentDepositor.deposit{value: aboveMaximum * 1_000_000_000}(
             pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei
@@ -287,7 +287,7 @@ contract FigmentEth2DepositorTest is Test {
         uint256 wrongValue = expectedValue + 1; // Send 1 wei too much
 
         vm.expectRevert(
-            abi.encodeWithSelector(FigmentEth2Depositor.EthAmountMismatch.selector, wrongValue, expectedValue)
+            abi.encodeWithSelector(FigmentEth2DepositorV1.EthAmountMismatch.selector, wrongValue, expectedValue)
         );
         figmentDepositor.deposit{value: wrongValue}(
             pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei
@@ -315,7 +315,7 @@ contract FigmentEth2DepositorTest is Test {
         uint256 preMockBalance = address(mockDepositContract).balance;
 
         vm.expectRevert(
-            abi.encodeWithSelector(FigmentEth2Depositor.EthAmountMismatch.selector, wrongValue, expectedValue)
+            abi.encodeWithSelector(FigmentEth2DepositorV1.EthAmountMismatch.selector, wrongValue, expectedValue)
         );
         figmentDepositor.deposit{value: wrongValue}(
             pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei
@@ -354,7 +354,7 @@ contract FigmentEth2DepositorTest is Test {
         uint256 totalValue = (32_000_000_000 + invalidAmount) * 1_000_000_000;
 
         vm.expectRevert(
-            abi.encodeWithSelector(FigmentEth2Depositor.InsufficientAmount.selector, invalidAmount, 32_000_000_000)
+            abi.encodeWithSelector(FigmentEth2DepositorV1.InsufficientAmount.selector, invalidAmount, 32_000_000_000)
         );
         figmentDepositor.deposit{value: totalValue}(
             pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei
@@ -380,7 +380,7 @@ contract FigmentEth2DepositorTest is Test {
             _createValidValidatorDataWithoutPubkey(32_000_000_000);
         amountsGwei[0] = 32_000_000_000;
 
-        vm.expectRevert(abi.encodeWithSelector(FigmentEth2Depositor.InvalidValidatorData.selector, 0, "pubkey"));
+        vm.expectRevert(abi.encodeWithSelector(FigmentEth2DepositorV1.InvalidValidatorData.selector, 0, "pubkey"));
         figmentDepositor.deposit{value: 32 ether}(
             pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei
         );
@@ -405,7 +405,7 @@ contract FigmentEth2DepositorTest is Test {
         amountsGwei[0] = 32_000_000_000;
 
         vm.expectRevert(
-            abi.encodeWithSelector(FigmentEth2Depositor.InvalidValidatorData.selector, 0, "withdrawal_credentials")
+            abi.encodeWithSelector(FigmentEth2DepositorV1.InvalidValidatorData.selector, 0, "withdrawal_credentials")
         );
         figmentDepositor.deposit{value: 32 ether}(
             pubkeys, wrongWithdrawalCredentials, signatures, depositDataRoots, amountsGwei
@@ -430,7 +430,7 @@ contract FigmentEth2DepositorTest is Test {
             _createValidValidatorData(32_000_000_000);
         amountsGwei[0] = 32_000_000_000;
 
-        vm.expectRevert(abi.encodeWithSelector(FigmentEth2Depositor.InvalidValidatorData.selector, 0, "signature"));
+        vm.expectRevert(abi.encodeWithSelector(FigmentEth2DepositorV1.InvalidValidatorData.selector, 0, "signature"));
         figmentDepositor.deposit{value: 32 ether}(
             pubkeys, withdrawalCredentials, wrongSignatures, depositDataRoots, amountsGwei
         );
@@ -459,7 +459,7 @@ contract FigmentEth2DepositorTest is Test {
 
         uint256 totalValue = 64 ether;
 
-        vm.expectRevert(abi.encodeWithSelector(FigmentEth2Depositor.InvalidValidatorData.selector, 1, "pubkey"));
+        vm.expectRevert(abi.encodeWithSelector(FigmentEth2DepositorV1.InvalidValidatorData.selector, 1, "pubkey"));
         figmentDepositor.deposit{value: totalValue}(
             pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei
         );
@@ -536,9 +536,9 @@ contract FigmentEth2DepositorTest is Test {
             abi.encodePacked(uint64(1))
         );
 
-        // Expect the FigmentEth2Depositor event SECOND (it's emitted after the deposit)
+        // Expect the FigmentEth2DepositorV1 event SECOND (it's emitted after the deposit)
         vm.expectEmit(true, true, true, true);
-        emit FigmentEth2Depositor.DepositEvent(address(this), 1, totalValue);
+        emit FigmentEth2DepositorV1.DepositEvent(address(this), 1, totalValue);
 
         figmentDepositor.deposit{value: totalValue}(
             pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei
@@ -568,7 +568,7 @@ contract FigmentEth2DepositorTest is Test {
 
         // Execute successful deposit
         vm.expectEmit(true, true, true, true);
-        emit FigmentEth2Depositor.DepositEvent(address(this), 1, totalValue);
+        emit FigmentEth2DepositorV1.DepositEvent(address(this), 1, totalValue);
 
         figmentDepositor.deposit{value: totalValue}(
             pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei
@@ -635,7 +635,7 @@ contract FigmentEth2DepositorTest is Test {
         );
 
         vm.expectEmit(true, true, true, true);
-        emit FigmentEth2Depositor.DepositEvent(address(this), validatorCount, totalValue);
+        emit FigmentEth2DepositorV1.DepositEvent(address(this), validatorCount, totalValue);
 
         figmentDepositor.deposit{value: totalValue}(
             pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei
@@ -664,7 +664,7 @@ contract FigmentEth2DepositorTest is Test {
 
         // Expect DepositEvent to be emitted
         vm.expectEmit(true, true, true, true);
-        emit FigmentEth2Depositor.DepositEvent(address(this), validatorCount, totalValue);
+        emit FigmentEth2DepositorV1.DepositEvent(address(this), validatorCount, totalValue);
 
         figmentDepositor.deposit{value: totalValue}(
             pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei
@@ -697,7 +697,7 @@ contract FigmentEth2DepositorTest is Test {
 
         // Expect DepositEvent to be emitted
         vm.expectEmit(true, true, true, true);
-        emit FigmentEth2Depositor.DepositEvent(address(this), 2, totalValue);
+        emit FigmentEth2DepositorV1.DepositEvent(address(this), 2, totalValue);
 
         figmentDepositor.deposit{value: totalValue}(
             pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei
@@ -766,7 +766,7 @@ contract FigmentEth2DepositorTest is Test {
         );
 
         vm.expectEmit(true, true, true, true);
-        emit FigmentEth2Depositor.DepositEvent(address(this), 4, totalValue);
+        emit FigmentEth2DepositorV1.DepositEvent(address(this), 4, totalValue);
 
         figmentDepositor.deposit{value: totalValue}(
             pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei
@@ -790,7 +790,7 @@ contract FigmentEth2DepositorTest is Test {
         uint256 totalValue = amountGwei * 1_000_000_000;
 
         // Call with no ETH value
-        vm.expectRevert(abi.encodeWithSelector(FigmentEth2Depositor.EthAmountMismatch.selector, 0, totalValue));
+        vm.expectRevert(abi.encodeWithSelector(FigmentEth2DepositorV1.EthAmountMismatch.selector, 0, totalValue));
         figmentDepositor.deposit{value: 0}(pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei);
     }
 
@@ -902,7 +902,7 @@ contract FigmentEth2DepositorTest is Test {
         uint256 totalValue = amountGwei * 1_000_000_000;
 
         vm.expectEmit(true, true, true, true);
-        emit FigmentEth2Depositor.DepositEvent(address(this), 1, totalValue);
+        emit FigmentEth2DepositorV1.DepositEvent(address(this), 1, totalValue);
 
         figmentDepositor.deposit{value: totalValue}(
             pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei

@@ -1,13 +1,13 @@
 # Analysis and Monitoring Scripts
 
-This directory contains scripts for gas analysis and event monitoring for the FigmentEth2Depositor contracts.
+This directory contains scripts for gas analysis and event monitoring for the FigmentEth2DepositorV1 contracts.
 
 ## Scripts Overview
 
 ### 1. `analyze-gas.ts`
 **Gas cost comparison between new and legacy contracts**
 
-Analyzes and compares gas costs between the new `FigmentEth2Depositor` (variable amounts) and legacy `FigmentEth2Depositor0x01` (fixed 32 ETH) contracts. Provides detailed gas usage reports with cost calculations.
+Analyzes and compares gas costs between the new `FigmentEth2DepositorV1` (variable amounts) and legacy `FigmentEth2DepositorV0` (fixed 32 ETH) contracts. Provides detailed gas usage reports with cost calculations.
 
 ```bash
 # Run gas analysis comparison
