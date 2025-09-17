@@ -1,10 +1,10 @@
 # ERC-7730 Clear Signing Integration Guide
 
-This guide helps wallet developers integrate ERC-7730 compliant clear signing support for the FigmentEth2Depositor contract.
+This guide helps wallet developers integrate ERC-7730 compliant clear signing support for the FigmentEth2DepositorV1 contract.
 
 ## Overview
 
-The FigmentEth2Depositor contract creates multiple Ethereum 2.0 validators in a single transaction with custom stake amounts. This guide provides ERC-7730 standard implementation details for enhanced clear signing. The ERC-7730 format provides standardized metadata that helps users understand:
+The FigmentEth2DepositorV1 contract creates multiple Ethereum 2.0 validators in a single transaction with custom stake amounts. This guide provides ERC-7730 standard implementation details for enhanced clear signing. The ERC-7730 format provides standardized metadata that helps users understand:
 
 1. **What they're doing**: Creating Ethereum 2.0 validators
 2. **How much they're staking**: Total ETH and per-validator amounts
@@ -309,7 +309,7 @@ To submit to the [ERC-7730 registry](https://github.com/LedgerHQ/clear-signing-e
 Update the ABI URL in the descriptor once published:
 ```json
 "abi": {
-  "url": "https://raw.githubusercontent.com/figment-networks/figment-eth2-depositor/main/artifacts/contracts/FigmentEth2Depositor.sol/FigmentEth2Depositor.json"
+  "url": "https://raw.githubusercontent.com/figment-networks/figment-eth2-depositor/main/artifacts/contracts/FigmentEth2DepositorV1.sol/FigmentEth2DepositorV1.json"
 }
 ```
 

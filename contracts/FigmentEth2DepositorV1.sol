@@ -7,14 +7,14 @@ import "@openzeppelin/contracts/utils/Pausable.sol";
 import "../contracts/interfaces/IDepositContract.sol";
 
 /**
- * @title FigmentEth2Depositor
+ * @title FigmentEth2DepositorV1
  * @notice Batch Ethereum 2.0 validator deposit contract with variable amounts
  * @dev Allows creating multiple validators in a single transaction with custom stake amounts
  * @dev Supports deposits between 32 ETH and 2048 ETH per validator
  * @dev Maximum 500 validators per transaction for gas efficiency
  * @author Figment
  */
-contract FigmentEth2Depositor is Pausable, Ownable {
+contract FigmentEth2DepositorV1 is Pausable, Ownable {
     /**
      * @dev Custom errors for better gas efficiency and debugging
      */

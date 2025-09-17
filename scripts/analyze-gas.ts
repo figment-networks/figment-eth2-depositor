@@ -20,8 +20,8 @@ async function main() {
 
   // Deploy contracts
   console.log("Deploying test contracts...");
-  const newContract = await viem.deployContract("FigmentEth2Depositor", [mockDepositContract]);
-  const legacyContract = await viem.deployContract("FigmentEth2Depositor0x01", [mockDepositContract]);
+  const newContract = await viem.deployContract("FigmentEth2DepositorV1", [mockDepositContract]);
+  const legacyContract = await viem.deployContract("FigmentEth2DepositorV0", [mockDepositContract]);
 
   console.log(`✅ New Contract deployed at: ${newContract.address}`);
   console.log(`✅ Legacy Contract deployed at: ${legacyContract.address}\n`);

@@ -1,8 +1,8 @@
 {
   "$schema": "https://raw.githubusercontent.com/LedgerHQ/clear-signing-erc7730-registry/master/schemas/erc7730.schema.json",
   "metadata": {
-    "name": "FigmentEth2Depositor ABI Definitions",
-    "description": "Human-readable ABI and function descriptions for FigmentEth2Depositor contract",
+    "name": "FigmentEth2DepositorV1 ABI Definitions",
+    "description": "Human-readable ABI and function descriptions for FigmentEth2DepositorV1 contract",
     "version": "1.0.0",
     "erc7730_compatible": true
   },
@@ -31,13 +31,13 @@
       "title": "Pause Contract",
       "summary": "Temporarily disable new deposits",
       "details": "Prevents new validator deposits until unpaused. Only the contract owner can perform this action.",
-      "erc7730_intent": "Pause the FigmentEth2Depositor contract"
+      "erc7730_intent": "Pause the FigmentEth2DepositorV1 contract"
     },
     "unpause": {
       "title": "Unpause Contract",
       "summary": "Re-enable deposits",
       "details": "Allows new validator deposits again. Only the contract owner can perform this action.",
-      "erc7730_intent": "Unpause the FigmentEth2Depositor contract"
+      "erc7730_intent": "Unpause the FigmentEth2DepositorV1 contract"
     }
   },
   "erc7730_field_mappings": {

@@ -30,7 +30,7 @@ This project includes an example Ignition module to deploy the contract. You can
 To run the deployment to a local chain:
 
 ```shell
-pnpm hardhat ignition deploy ignition/modules/FigmentEth2Depositor.ts
+pnpm hardhat ignition deploy ignition/modules/FigmentEth2DepositorV0.ts
 ```
 
 To run the deployment to Sepolia, you need an account with funds to send the transaction. The provided Hardhat configuration includes a Configuration Variable called `SEPOLIA_PRIVATE_KEY`, which you can use to set the private key of the account you want to use.
@@ -67,7 +67,7 @@ Below is a list of contracts we use for this service:
 </dl>
 
 <dl>
-  <dt>FigmentEth2Depositor0x01</dt>
+  <dt>FigmentEth2DepositorV0</dt>
   <dd>A smart contract that accepts X amount of ETH and sends {x / 32} transactions with required collateral (32 ETH) to the Eth2 Deposit Contract.</dd>
 </dl>
 
@@ -76,4 +76,4 @@ Below is a list of contracts we use for this service:
 1. Choose the amount of Eth2 validator nodes you want to deposit to.
 2. Instantiate those validators with your chosen `withdrawal_credentials`
 3. Retrieve your validators' `pubkeys`, and generate `deposit_signatures` and `deposit_data_roots` from each that will let you deposit to them.
-4. Use the _deposit()_ function on `FigmentEth2Depositor` with the required ETH value to make the deposits to the Eth2 Deposit Contract.
+4. Use the _deposit()_ function on `FigmentEth2DepositorV0` with the required ETH value to make the deposits to the Eth2 Deposit Contract.
