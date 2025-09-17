@@ -15,7 +15,6 @@ import "../contracts/interfaces/IDepositContract.sol";
  * @author Figment
  */
 contract FigmentEth2Depositor is Pausable, Ownable {
-
     /**
      * @dev Custom errors for better gas efficiency and debugging
      */
@@ -98,7 +97,6 @@ contract FigmentEth2Depositor is Pausable, Ownable {
         bytes32[] calldata deposit_data_roots,
         uint256[] calldata amounts_gwei
     ) external payable whenNotPaused {
-
         uint256 nodesAmount = pubkeys.length;
 
         // Gas optimization: Validate validator count bounds
@@ -145,7 +143,6 @@ contract FigmentEth2Depositor is Pausable, Ownable {
             }
         }
 
-
         if (msg.value != totalAmount) {
             revert EthAmountMismatch(msg.value, totalAmount);
         }
@@ -163,7 +160,7 @@ contract FigmentEth2Depositor is Pausable, Ownable {
                     withdrawal_credentials[i],
                     signatures[i],
                     deposit_data_roots[i]
-                );
+              );
             }
         }
 
