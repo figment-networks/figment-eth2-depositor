@@ -134,14 +134,14 @@
   },
   "constants": {
     "NODES_MAX_AMOUNT": 500,
-    "MIN_COLLATERAL_GWEI": "32000000000",
+    "MIN_COLLATERAL_GWEI": "1000000000",
     "MAX_COLLATERAL_GWEI": "2048000000000"
   },
   "security": {
     "risk_level": "high",
     "warnings": [
       "Validators are subject to slashing conditions",
-      "Minimum 32 ETH required per validator",
+      "Minimum 1 ETH required per validator",
       "Invalid validator data may result in permanent loss"
     ],
     "audits": [],

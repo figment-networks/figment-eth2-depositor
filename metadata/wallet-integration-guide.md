@@ -175,7 +175,7 @@ Display as: "Total Stake: {totalETH} ETH"
 ## Error Messages
 
 ### Common Validation Errors
-- `InsufficientAmount`: "Deposit amount too low. Minimum 32 ETH per validator."
+- `InsufficientAmount`: "Deposit amount too low. Minimum 1 ETH per validator."
 - `EthAmountMismatch`: "Transaction value doesn't match total stake amount."
 - `ParametersMismatch`: "Mismatched array lengths. All arrays must have same length."
 - `InvalidValidatorData`: "Invalid validator data at position {index}."
@@ -184,7 +184,7 @@ Display as: "Total Stake: {totalETH} ETH"
 ```
 ❌ Transaction Failed
 Reason: Deposit amount too low
-Solution: Each validator requires at least 32 ETH
+Solution: Each validator requires at least 1 ETH
 Your amount: 30 ETH (Validator #2)
 ```
 
