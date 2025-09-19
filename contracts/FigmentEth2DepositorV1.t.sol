@@ -238,13 +238,13 @@ contract FigmentEth2DepositorV1Test is Test {
         bytes32[] memory depositDataRoots = new bytes32[](1);
         uint256[] memory amountsGwei = new uint256[](1);
 
-        uint256 belowMinimum = 31_999_999_999; // Just below 32 ETH in gwei
+        uint256 belowMinimum = 999_999_999; // Just below 1 ETH in gwei
         (pubkeys[0], withdrawalCredentials[0], signatures[0], depositDataRoots[0]) =
             _createValidValidatorData(belowMinimum);
         amountsGwei[0] = belowMinimum;
 
         vm.expectRevert(
-            abi.encodeWithSelector(FigmentEth2DepositorV1.InsufficientAmount.selector, belowMinimum, 32_000_000_000)
+            abi.encodeWithSelector(FigmentEth2DepositorV1.InsufficientAmount.selector, belowMinimum, 1_000_000_000)
         );
         figmentDepositor.deposit{value: belowMinimum * 1_000_000_000}(
             pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei
@@ -342,19 +342,19 @@ contract FigmentEth2DepositorV1Test is Test {
 
         // First validator with valid amount
         (pubkeys[0], withdrawalCredentials[0], signatures[0], depositDataRoots[0]) =
-            _createValidValidatorData(32_000_000_000);
-        amountsGwei[0] = 32_000_000_000;
+            _createValidValidatorData(1_000_000_000);
+        amountsGwei[0] = 1_000_000_000;
 
         // Second validator with invalid amount (too low)
-        uint256 invalidAmount = 31_999_999_999;
+        uint256 invalidAmount = 999_999_999;
         (pubkeys[1], withdrawalCredentials[1], signatures[1], depositDataRoots[1]) =
             _createValidValidatorData(invalidAmount);
         amountsGwei[1] = invalidAmount;
 
-        uint256 totalValue = (32_000_000_000 + invalidAmount) * 1_000_000_000;
+        uint256 totalValue = (1_000_000_000 + invalidAmount) * 1_000_000_000;
 
         vm.expectRevert(
-            abi.encodeWithSelector(FigmentEth2DepositorV1.InsufficientAmount.selector, invalidAmount, 32_000_000_000)
+            abi.encodeWithSelector(FigmentEth2DepositorV1.InsufficientAmount.selector, invalidAmount, 1_000_000_000)
         );
         figmentDepositor.deposit{value: totalValue}(
             pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei
@@ -377,11 +377,11 @@ contract FigmentEth2DepositorV1Test is Test {
         }
 
         (withdrawalCredentials[0], signatures[0], depositDataRoots[0]) =
-            _createValidValidatorDataWithoutPubkey(32_000_000_000);
-        amountsGwei[0] = 32_000_000_000;
+            _createValidValidatorDataWithoutPubkey(1_000_000_000);
+        amountsGwei[0] = 1_000_000_000;
 
         vm.expectRevert(abi.encodeWithSelector(FigmentEth2DepositorV1.InvalidValidatorData.selector, 0, "pubkey"));
-        figmentDepositor.deposit{value: 32 ether}(
+        figmentDepositor.deposit{value: 1 ether}(
             pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei
         );
     }

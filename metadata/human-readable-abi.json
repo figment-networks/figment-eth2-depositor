@@ -74,7 +74,7 @@
       "display_as": "ETH",
       "conversion": "value / 1e9",
       "format": "{value} ETH",
-      "validation_display": "Between 32 ETH and 2048 ETH",
+      "validation_display": "Between 1 ETH and 2048 ETH",
       "note": "Legacy format - use ERC-7730 descriptor for modern wallets"
     },
     "pubkeys": {

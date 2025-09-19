@@ -10,7 +10,7 @@ import "../contracts/interfaces/IDepositContract.sol";
  * @title FigmentEth2DepositorV1
  * @notice Batch Ethereum 2.0 validator deposit contract with variable amounts
  * @dev Allows creating multiple validators in a single transaction with custom stake amounts
- * @dev Supports deposits between 32 ETH and 2048 ETH per validator
+ * @dev Supports deposits between 1 ETH and 2048 ETH per validator
  * @dev Maximum 500 validators per transaction for gas efficiency
  * @author Figment
  */
@@ -53,7 +53,7 @@ contract FigmentEth2DepositorV1 is Pausable, Ownable {
     /**
      * @dev Minimum collateral in gwei
      */
-    uint256 public constant MIN_COLLATERAL_GWEI = 32_000_000_000; // 32 ETH in gwei
+    uint256 public constant MIN_COLLATERAL_GWEI = 1_000_000_000; // 1 ETH in gwei
 
     /**
      * @dev Maximum collateral in gwei based on Ethereum protocol limits.
@@ -85,7 +85,7 @@ contract FigmentEth2DepositorV1 is Pausable, Ownable {
      * @param withdrawal_credentials Array of withdrawal credentials (32 bytes each) - where rewards will be sent
      * @param signatures Array of BLS12-381 signatures (96 bytes each) - proves ownership of validator keys
      * @param deposit_data_roots Array of SSZ deposit data roots (32 bytes each) - integrity checksums
-     * @param amounts_gwei Array of deposit amounts in gwei - must be between 32 ETH and 2048 ETH per validator
+     * @param amounts_gwei Array of deposit amounts in gwei - must be between 1 ETH and 2048 ETH per validator
      * @dev msg.value must equal the sum of all amounts_gwei converted to wei
      * @dev Each validator will be created on Ethereum 2.0 with the specified amount
      * @dev Funds will be locked until Ethereum 2.0 withdrawals are enabled
