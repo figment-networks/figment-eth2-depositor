@@ -175,10 +175,20 @@ Display as: "Total Stake: {totalETH} ETH"
 ## Error Messages
 
 ### Common Validation Errors
-- `InsufficientAmount`: "Deposit amount too low. Minimum 1 ETH per validator."
-- `EthAmountMismatch`: "Transaction value doesn't match total stake amount."
-- `ParametersMismatch`: "Mismatched array lengths. All arrays must have same length."
-- `InvalidValidatorData`: "Invalid validator data at position {index}."
+
+- `NodesAmountZero`: "Empty array is passed in for pubkeys arg. Min one pubkey must be provided."
+- `NodesAmountTooLarge`: "Too many validators requested. Maximum 500 validators allowed per transaction. You requested: {provided}"
+- `AmountTooLow`: "Stake amount too low. Minimum 1 ETH required. You provided: {provided} gwei"
+- `AmountTooHigh`: "Stake amount too high. Maximum 2048 ETH allowed. You provided: {provided} gwei"
+- `EthAmountMismatch`: "Transaction value doesn't match total stake amount. Expected: {expected} wei, Provided: {provided} wei"
+- `InvalidValidatorData`: "Invalid {field} data for validator at position {index}"
+- `ZeroAddress`: "Zero address provided for deposit contract"
+- `DirectEthTransferNotAllowed`: "Direct ETH transfers not allowed. Use deposit() function instead"
+- `WithdrawalCredentialsLengthMismatch`: "Withdrawal credentials array length mismatch. Expected: {expected}, Provided: {provided}"
+- `SignaturesLengthMismatch`: "Signatures array length mismatch. Expected: {expected}, Provided: {provided}"
+- `DepositDataRootsLengthMismatch`: "Deposit data roots array length mismatch. Expected: {expected}, Provided: {provided}"
+- `AmountsLengthMismatch`: "Amounts array length mismatch. Expected: {expected}, Provided: {provided}"
+- `OwnershipCannotBeRenounced`: "Contract ownership cannot be renounced"
 
 ### Clear Error Display
 ```
