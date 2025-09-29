@@ -134,7 +134,7 @@ contract FigmentEth2DepositorV1Test is Test {
         bytes32[] memory depositDataRoots = new bytes32[](0);
         uint256[] memory amountsGwei = new uint256[](0);
 
-        vm.expectRevert(abi.encodeWithSelector(FigmentEth2DepositorV1.ParametersMismatch.selector, 0, 500));
+        vm.expectRevert(FigmentEth2DepositorV1.NodesAmountZero.selector);
         figmentDepositor.deposit{value: 0}(pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei);
     }
 
@@ -155,13 +155,13 @@ contract FigmentEth2DepositorV1Test is Test {
 
         uint256 totalValue = 32_000_000_000 * 1_000_000_000 * tooManyNodes; // Convert to wei
 
-        vm.expectRevert(abi.encodeWithSelector(FigmentEth2DepositorV1.ParametersMismatch.selector, tooManyNodes, 500));
+        vm.expectRevert(abi.encodeWithSelector(FigmentEth2DepositorV1.NodesAmountTooLarge.selector, tooManyNodes, 500));
         figmentDepositor.deposit{value: totalValue}(
             pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei
         );
     }
 
-    function test_Deposit_PubkeysLengthMismatch_Reverts() public {
+    function test_Deposit_WCLengthMismatch_Reverts() public {
         bytes[] memory pubkeys = new bytes[](1);
         bytes[] memory withdrawalCredentials = new bytes[](2); // Different length
         bytes[] memory signatures = new bytes[](1);
@@ -172,7 +172,9 @@ contract FigmentEth2DepositorV1Test is Test {
             _createValidValidatorData(32_000_000_000);
         amountsGwei[0] = 32_000_000_000;
 
-        vm.expectRevert(abi.encodeWithSelector(FigmentEth2DepositorV1.ParametersMismatch.selector, 1, 0));
+        vm.expectRevert(
+            abi.encodeWithSelector(FigmentEth2DepositorV1.WithdrawalCredentialsLengthMismatch.selector, 2, 1)
+        );
         figmentDepositor.deposit{value: 32 ether}(
             pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei
         );
@@ -189,7 +191,7 @@ contract FigmentEth2DepositorV1Test is Test {
             _createValidValidatorData(32_000_000_000);
         amountsGwei[0] = 32_000_000_000;
 
-        vm.expectRevert(abi.encodeWithSelector(FigmentEth2DepositorV1.ParametersMismatch.selector, 1, 0));
+        vm.expectRevert(abi.encodeWithSelector(FigmentEth2DepositorV1.SignaturesLengthMismatch.selector, 2, 1));
         figmentDepositor.deposit{value: 32 ether}(
             pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei
         );
@@ -206,7 +208,7 @@ contract FigmentEth2DepositorV1Test is Test {
             _createValidValidatorData(32_000_000_000);
         amountsGwei[0] = 32_000_000_000;
 
-        vm.expectRevert(abi.encodeWithSelector(FigmentEth2DepositorV1.ParametersMismatch.selector, 1, 0));
+        vm.expectRevert(abi.encodeWithSelector(FigmentEth2DepositorV1.DepositDataRootsLengthMismatch.selector, 2, 1));
         figmentDepositor.deposit{value: 32 ether}(
             pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei
         );
@@ -223,7 +225,7 @@ contract FigmentEth2DepositorV1Test is Test {
             _createValidValidatorData(32_000_000_000);
         amountsGwei[0] = 32_000_000_000;
 
-        vm.expectRevert(abi.encodeWithSelector(FigmentEth2DepositorV1.ParametersMismatch.selector, 1, 0));
+        vm.expectRevert(abi.encodeWithSelector(FigmentEth2DepositorV1.AmountsLengthMismatch.selector, 2, 1));
         figmentDepositor.deposit{value: 32 ether}(
             pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei
         );
@@ -244,7 +246,7 @@ contract FigmentEth2DepositorV1Test is Test {
         amountsGwei[0] = belowMinimum;
 
         vm.expectRevert(
-            abi.encodeWithSelector(FigmentEth2DepositorV1.InsufficientAmount.selector, belowMinimum, 1_000_000_000)
+            abi.encodeWithSelector(FigmentEth2DepositorV1.AmountTooLow.selector, belowMinimum, 1_000_000_000)
         );
         figmentDepositor.deposit{value: belowMinimum * 1_000_000_000}(
             pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei
@@ -264,7 +266,7 @@ contract FigmentEth2DepositorV1Test is Test {
         amountsGwei[0] = aboveMaximum;
 
         vm.expectRevert(
-            abi.encodeWithSelector(FigmentEth2DepositorV1.InsufficientAmount.selector, aboveMaximum, 2_048_000_000_000)
+            abi.encodeWithSelector(FigmentEth2DepositorV1.AmountTooHigh.selector, aboveMaximum, 2_048_000_000_000)
         );
         figmentDepositor.deposit{value: aboveMaximum * 1_000_000_000}(
             pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei
@@ -354,7 +356,7 @@ contract FigmentEth2DepositorV1Test is Test {
         uint256 totalValue = (1_000_000_000 + invalidAmount) * 1_000_000_000;
 
         vm.expectRevert(
-            abi.encodeWithSelector(FigmentEth2DepositorV1.InsufficientAmount.selector, invalidAmount, 1_000_000_000)
+            abi.encodeWithSelector(FigmentEth2DepositorV1.AmountTooLow.selector, invalidAmount, 1_000_000_000)
         );
         figmentDepositor.deposit{value: totalValue}(
             pubkeys, withdrawalCredentials, signatures, depositDataRoots, amountsGwei
@@ -922,18 +924,28 @@ contract FigmentEth2DepositorV1Test is Test {
 
         figmentDepositor.transferOwnership(newOwner);
 
+        //Nothing should change until new owner accepts
+        assertEq(figmentDepositor.owner(), address(this));
+        assertEq(figmentDepositor.pendingOwner(), newOwner);
+
+        vm.prank(newOwner);
+        figmentDepositor.acceptOwnership();
+
         assertEq(figmentDepositor.owner(), newOwner);
+        assertEq(figmentDepositor.pendingOwner(), address(0));
     }
 
     function test_RenounceOwnership() public {
+        vm.expectRevert(FigmentEth2DepositorV1.OwnershipCannotBeRenounced.selector);
         figmentDepositor.renounceOwnership();
-
-        assertEq(figmentDepositor.owner(), address(0));
     }
 
     function test_NewOwner_CanPauseAndUnpause() public {
         address newOwner = address(0x789);
         figmentDepositor.transferOwnership(newOwner);
+
+        vm.prank(newOwner);
+        figmentDepositor.acceptOwnership();
 
         vm.prank(newOwner);
         figmentDepositor.pause();
@@ -948,7 +960,11 @@ contract FigmentEth2DepositorV1Test is Test {
         address newOwner = address(0x999);
         figmentDepositor.transferOwnership(newOwner);
 
+        vm.prank(newOwner);
+        figmentDepositor.acceptOwnership();
+
         // Old owner (this contract) should not be able to pause
+        vm.prank(address(this));
         vm.expectRevert();
         figmentDepositor.pause();
     }

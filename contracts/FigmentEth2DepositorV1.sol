@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.28;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/access/Ownable2Step.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
 import "../contracts/interfaces/IDepositContract.sol";
 
@@ -14,16 +14,23 @@ import "../contracts/interfaces/IDepositContract.sol";
  * @dev Maximum 500 validators per transaction for gas efficiency
  * @author Figment
  */
-contract FigmentEth2DepositorV1 is Pausable, Ownable {
+contract FigmentEth2DepositorV1 is Pausable, Ownable2Step {
     /**
      * @dev Custom errors for better gas efficiency and debugging
      */
-    error InsufficientAmount(uint256 provided, uint256 minimum);
+    error NodesAmountZero();
+    error NodesAmountTooLarge(uint256 provided, uint256 maximum);
+    error AmountTooLow(uint256 provided, uint256 minimum);
+    error AmountTooHigh(uint256 provided, uint256 maximum);
     error EthAmountMismatch(uint256 provided, uint256 expected);
-    error ParametersMismatch(uint256 expected, uint256 provided);
     error InvalidValidatorData(uint256 index, string field);
     error ZeroAddress();
     error DirectEthTransferNotAllowed();
+    error WithdrawalCredentialsLengthMismatch(uint256 provided, uint256 expected);
+    error SignaturesLengthMismatch(uint256 provided, uint256 expected);
+    error DepositDataRootsLengthMismatch(uint256 provided, uint256 expected);
+    error AmountsLengthMismatch(uint256 provided, uint256 expected);
+    error OwnershipCannotBeRenounced();
 
     /**
      * @dev Eth2 Deposit Contract address.
@@ -99,17 +106,24 @@ contract FigmentEth2DepositorV1 is Pausable, Ownable {
     ) external payable whenNotPaused {
         uint256 nodesAmount = pubkeys.length;
 
-        // Gas optimization: Validate validator count bounds
-        if (nodesAmount == 0 || nodesAmount > NODES_MAX_AMOUNT) {
-            revert ParametersMismatch(nodesAmount, NODES_MAX_AMOUNT);
+        if (nodesAmount == 0) {
+            revert NodesAmountZero();
+        }
+        if (nodesAmount > NODES_MAX_AMOUNT) {
+            revert NodesAmountTooLarge(nodesAmount, NODES_MAX_AMOUNT);
         }
 
-        // Gas optimization: Combined length validation to reduce multiple checks
-        if (withdrawal_credentials.length != nodesAmount ||
-            signatures.length != nodesAmount ||
-            deposit_data_roots.length != nodesAmount ||
-            amounts_gwei.length != nodesAmount) {
-            revert ParametersMismatch(nodesAmount, 0); // Use 0 as generic mismatch indicator
+        if (withdrawal_credentials.length != nodesAmount) {
+            revert WithdrawalCredentialsLengthMismatch(withdrawal_credentials.length, nodesAmount);
+        }
+        if (signatures.length != nodesAmount) {
+            revert SignaturesLengthMismatch(signatures.length, nodesAmount);
+        }
+        if (deposit_data_roots.length != nodesAmount) {
+            revert DepositDataRootsLengthMismatch(deposit_data_roots.length, nodesAmount);
+        }
+        if (amounts_gwei.length != nodesAmount) {
+            revert AmountsLengthMismatch(amounts_gwei.length, nodesAmount);
         }
 
         // Note: totalAmount overflow is mathematically impossible within practical limits:
@@ -121,10 +135,10 @@ contract FigmentEth2DepositorV1 is Pausable, Ownable {
 
                 // Validate amounts first (most likely to fail fast)
                 if (amountGwei < MIN_COLLATERAL_GWEI) {
-                    revert InsufficientAmount(amountGwei, MIN_COLLATERAL_GWEI);
+                    revert AmountTooLow(amountGwei, MIN_COLLATERAL_GWEI);
                 }
                 if (amountGwei > MAX_COLLATERAL_GWEI) {
-                    revert InsufficientAmount(amountGwei, MAX_COLLATERAL_GWEI);
+                    revert AmountTooHigh(amountGwei, MAX_COLLATERAL_GWEI);
                 }
 
                 // Validate data lengths
@@ -156,11 +170,8 @@ contract FigmentEth2DepositorV1 is Pausable, Ownable {
                 uint256 amountWei = amounts_gwei[i] * GWEI_TO_WEI;
 
                 cachedDepositContract.deposit{value: amountWei}(
-                    pubkeys[i],
-                    withdrawal_credentials[i],
-                    signatures[i],
-                    deposit_data_roots[i]
-              );
+                    pubkeys[i], withdrawal_credentials[i], signatures[i], deposit_data_roots[i]
+                );
             }
         }
 
@@ -175,7 +186,7 @@ contract FigmentEth2DepositorV1 is Pausable, Ownable {
      * - The contract must not be paused.
      */
     function pause() external onlyOwner {
-      _pause();
+        _pause();
     }
 
     /**
@@ -186,7 +197,15 @@ contract FigmentEth2DepositorV1 is Pausable, Ownable {
      * - The contract must be paused.
      */
     function unpause() external onlyOwner {
-      _unpause();
+        _unpause();
+    }
+
+    /**
+     * @dev Fully disable ownership renouncement.
+     *
+     */
+    function renounceOwnership() public pure override {
+        revert OwnershipCannotBeRenounced();
     }
 
     /**

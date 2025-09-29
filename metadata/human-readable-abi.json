@@ -11,7 +11,10 @@
     "function pause() onlyOwner",
     "function unpause() onlyOwner",
     "function paused() view returns (bool)",
+    "function transferOwnership(address newOwner) onlyOwner",
+    "function acceptOwnership()",
     "function owner() view returns (address)",
+    "function pendingOwner() view returns (address)",
     "function depositContract() view returns (address)",
     "event BatchDepositEvent(address indexed from, uint256 nodesAmount, uint256 totalAmount)"
   ],
@@ -38,6 +41,18 @@
       "summary": "Re-enable deposits",
       "details": "Allows new validator deposits again. Only the contract owner can perform this action.",
       "erc7730_intent": "Unpause the FigmentEth2DepositorV1 contract"
+    },
+    "transferOwnership": {
+      "title": "Transfer Ownership",
+      "summary": "Starts the ownership transfer of the contract to a new account.",
+      "details": "Replaces the pending transfer if there is one. Can only be called by the current owner.",
+      "erc7730_intent": "Transfer ownership of the FigmentEth2DepositorV1 contract to {{newOwner}}"
+    },
+    "acceptOwnership": {
+      "title": "Accept Ownership",
+      "summary": "Accept ownership of the contract",
+      "details": "Only the new owner can perform this action.",
+      "erc7730_intent": "Accept ownership of the FigmentEth2DepositorV1 contract"
     }
   },
   "erc7730_field_mappings": {
