@@ -49,7 +49,7 @@ const config: HardhatUserConfig = {
     hoodi: {
       type: "http",
       chainType: "l1",
-      url: configVariable("HOODI_RPC_URL"),
+      url: "https://ethereum-hoodi-rpc.publicnode.com",
       accounts: [configVariable("HOODI_PRIVATE_KEY")],
     },
   },
