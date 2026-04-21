@@ -3,13 +3,20 @@
   "version": "1.0.0",
   "type": "module",
   "devDependencies": {
-    "@nomicfoundation/hardhat-ignition": "^3.0.0",
-    "@nomicfoundation/hardhat-toolbox-viem": "^5.0.0",
-    "@openzeppelin/contracts": "^5.4.0",
+    "@nomicfoundation/hardhat-ignition": "^3.1.2",
+    "@nomicfoundation/hardhat-toolbox-viem": "^5.0.4",
+    "@openzeppelin/contracts": "^5.6.1",
     "@types/node": "^22.8.5",
     "forge-std": "github:foundry-rs/forge-std#v1.9.4",
-    "hardhat": "^3.0.6",
+    "hardhat": "^3.4.0",
     "typescript": "~5.8.0",
-    "viem": "^2.30.0"
+    "viem": "^2.48.2"
+  },
+  "pnpm": {
+    "overrides": {
+      "undici": "^6.25.0",
+      "bn.js": "^5.2.3",
+      "lodash-es": "^4.18.1"
+    }
   }
 }
