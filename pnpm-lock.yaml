@@ -5,7 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  undici: ^6.25.0
+  undici: ^6.28.1
   bn.js: ^5.2.3
   lodash-es: ^4.18.1
   adm-zip: ^0.6.0
@@ -800,8 +800,8 @@ packages:
   undici-types@6.21.0:
     resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
 
-  undici@6.25.0:
-    resolution: {integrity: sha512-ZgpWDC5gmNiuY9CnLVXEH8rl50xhRCuLNA97fAUnKi8RRuV4E6KG31pDTsLVUKnohJE0I3XDrTeEydAXRw47xg==}
+  undici@6.29.0:
+    resolution: {integrity: sha512-R+RODBqp6i2pPflGdq+xIOUkl+RNfGgHwoinecKu/JCuf2uO06cOKoDbI2P7Dn6KcswdKwrczbU6IYJ6K8X+wg==}
     engines: {node: '>=18.17'}
 
   util-deprecate@1.0.2:
@@ -856,7 +856,7 @@ snapshots:
   '@actions/http-client@2.2.3':
     dependencies:
       tunnel: 0.0.6
-      undici: 6.25.0
+      undici: 6.29.0
 
   '@actions/io@1.1.3': {}
 
@@ -1229,7 +1229,7 @@ snapshots:
       fast-equals: 5.4.0
       json-stream-stringify: 3.1.6
       rfdc: 1.4.1
-      undici: 6.25.0
+      undici: 6.29.0
     transitivePeerDependencies:
       - supports-color
 
@@ -1242,7 +1242,7 @@ snapshots:
       fast-equals: 5.4.0
       json-stream-stringify: 3.1.6
       rfdc: 1.4.1
-      undici: 6.25.0
+      undici: 6.29.0
     transitivePeerDependencies:
       - supports-color
 
@@ -1695,7 +1695,7 @@ snapshots:
 
   undici-types@6.21.0: {}
 
-  undici@6.25.0: {}
+  undici@6.29.0: {}
 
   util-deprecate@1.0.2: {}
 
