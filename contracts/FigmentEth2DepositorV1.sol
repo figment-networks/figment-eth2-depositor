@@ -40,12 +40,12 @@ contract FigmentEth2DepositorV1 is Pausable, Ownable2Step {
     /**
      * @dev Maximum amount of nodes per transaction.
      *
-     * Analysis shows 250 validators is conservative and safe:
-     * - Gas usage: ~5.3M gas (well under 15-20M practical limits)
-     * - Transaction size: ~60KB (well under 128KB network limit)
+     * Analysis shows 500 validators is conservative and safe:
+     * - Gas usage: ~10.6M gas (well under 15-20M practical limits)
+     * - Transaction size: ~120KB (under 128KB network limit)
      * - Theoretical maximums: ~544 validators (size) or ~709+ validators (gas)
      *
-     * We set the limit as 500 to be safe. That's a max of 1,024,000 ETH in one txn.
+     * We set the limit as 500. That's a max of 1,024,000 ETH in one txn.
      */
     uint256 public constant NODES_MAX_AMOUNT = 500;
     uint256 public constant PUBKEY_LENGTH = 48;
@@ -127,7 +127,7 @@ contract FigmentEth2DepositorV1 is Pausable, Ownable2Step {
         }
 
         // Note: totalAmount overflow is mathematically impossible within practical limits:
-        // Max per validator: 2048 ETH (~2e21 wei) × Max validators: 250 = ~5e23 wei << uint256.max (~1e77)
+        // Max per validator: 2048 ETH (~2e21 wei) × Max validators: 500 = ~1e24 wei << uint256.max (~1e77)
         uint256 totalAmount;
         unchecked {
             for (uint256 i; i < nodesAmount; ++i) {
@@ -162,7 +162,6 @@ contract FigmentEth2DepositorV1 is Pausable, Ownable2Step {
         }
 
         // Gas optimization: Deposit loop with unchecked arithmetic where safe
-        // Cache deposit contract to avoid repeated SLOAD
         IDepositContract cachedDepositContract = depositContract;
         unchecked {
             for (uint256 i; i < nodesAmount; ++i) {
